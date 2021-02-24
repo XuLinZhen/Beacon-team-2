@@ -27,7 +27,7 @@ extern float wifidata[20];
 extern float da[8];
 extern int Error;
 typedef struct _cardata{
-    int Motorspeed[3] = {22,0,150};
+    int Motorspeed[3]= {22,0,150};
     float servo_mid=7.51;            //定义舵机中值
     float servo_pwm=7.51;            //定义舵机pwm值
     float Kp = 0.0091;                //定义舵机比例系数

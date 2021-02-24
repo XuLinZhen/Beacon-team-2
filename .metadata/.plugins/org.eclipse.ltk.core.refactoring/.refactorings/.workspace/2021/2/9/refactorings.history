@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Delete resource &apos;HITSIC_TC264DA_ADS&apos;" deleteContents="true" description="Delete resource &apos;HITSIC_TC264DA_ADS&apos;" element1="/HITSIC_TC264DA_ADS" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1614151985025"/>
+</session>

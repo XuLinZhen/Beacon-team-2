@@ -46,7 +46,7 @@ typedef enum
 //  @brief      pit初始化
 //  @param      ccu6n           选择CCU6模块(CCU6_0、CCU6_1)
 //  @param      pit_ch          选择通道(PIT_CH0、PIT_CH1)
-//  @param      time            周期时间(us)
+//  @param      time            周期时间
 //  @return     void
 //  @note                       请使用.h文件中 带时间单位的宏定义函数
 //  Sample usage:               Pit_Init_ms(CCU6_0, PIT_CH0, 5000);    //设置周期中断5000ms
