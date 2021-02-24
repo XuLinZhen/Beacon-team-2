@@ -56,9 +56,13 @@ float my_pow(int  base, int power)
         }
         return result;
     }
-    else
+    else if(power == 1)
     {
-        return false;
+        return base;
+    }
+    else if(power == 0)
+    {
+        return result;
     }
 }
 
