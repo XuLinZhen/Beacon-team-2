@@ -106,54 +106,194 @@ int core0_main(void)
     IfxCpu_enableInterrupts();
     //初始化外设
 
+    buff = (uint8 *)malloc(4096);
+    Date_Read(0,8,buff);
+    memcpy(CAR, &buff[0], sizeof(Car_data) * Max_Item_Amount);
+    CAR[0].dataint++; //启动次数计数器
+
+    c_data[0].M_Kp=CAR[3].datafloat;
+    c_data[0].M_Ki=CAR[4].datafloat;
+    c_data[0].Motorspeed[0]=CAR[17].datafloat;
+    mora_flag=CAR[5].datafloat;
+    c_data[0].Kp=CAR[8].datafloat;
+    c_data[0].Kd=CAR[9].datafloat;
+    c_data[0].servo_mid=CAR[10].datafloat;
+    threshold=CAR[13].dataint;
+
+while(TRUE)
+{
+    switch(mode_flag)//菜单模式
+        {
+        case 0x00:
+        {
+            MenuPrint(MenuRoot, currItem);                  //构建菜单并打印
+            //当标志位为0时:
+            //MENU_Resume();   //菜单恢复
+            delay_runcar = 0;  //延迟发车标志位置为0
+            while(TRUE)
+            {
+                currItem = ButtonProcess(GetRoot(currItem), currItem);
+                //prem_flag = mode_flag;
+                servo_init(&(c_data[0].servo_pwm));//舵机初始化
+                Motorsp_Init();    //电机速度初始化
+                //if(prem_flag != mode_flag) break;  //如果标志位发生改变则打断循环
+                if(mode_flag != 0x00) break;
+            }
+        }
+        break;
+        case 0x01://百年校庆图标模式
+        {
+          //MENU_Suspend();          //菜单挂起
+          DISP_SSD1306_BufferUpload((uint8*) DISP_image_100thAnniversary);   //百年校庆图像显示
+          while(TRUE)
+          {
+              prem_flag = mode_flag;
+              SDK_DelayAtLeastUs(2000000,180*1000*1000);
+              //if(prem_flag != mode_flag) break;     //如果标志位发生改变则打断循环
+              if(mode_flag != 0x01) break;
+          }
+        }
+        break;
+        case 0x02://摄像头跑车模式
+        {
+            //pitMgr_t *p;//测试删除定时器中断
+            //MENU_Suspend();               //菜单挂起
+            SmartCar_OLED_Fill(0);
+            CAM_ZF9V034_GetDefaultConfig(&cameraCfg);                                   //设置摄像头配置
+            CAM_ZF9V034_CfgWrite(&cameraCfg);                                   //写入配置
+            CAM_ZF9V034_GetReceiverConfig(&dmadvpCfg, &cameraCfg);    //生成对应接收器的配置数据，使用此数据初始化接受器并接收图像数据。
+            DMADVP_Init(DMADVP0, &dmadvpCfg);
+            DMADVP_TransferCreateHandle(&dmadvpHandle, DMADVP0,CAM_ZF9V034_DmaCallback);
+            uint8_t *imageBuffer0 = new uint8_t[DMADVP0->imgSize];
+            dispBuffer = new disp_ssd1306_frameBuffer_t;
+            //uint8_t *imageBuffer1 = new uint8_t[DMADVP0->imgSize];
+             DMADVP_TransferSubmitEmptyBuffer(DMADVP0, &dmadvpHandle, imageBuffer0);
+             //DMADVP_TransferSubmitEmptyBuffer(DMADVP0, &dmadvpHandle, imageBuffer1);
+             DMADVP_TransferStart(DMADVP0, &dmadvpHandle);
+
+             Motorsp_Init();//电机速度初始化
+             servo_init(&(c_data[0].servo_pwm));//舵机初始化
+             delay_runcar = 0;   //延时发车标志位置0
+             //p = pitMgr_t::insert(5000U, 1U, Delay_car, pitMgr_t::enable);//延时发车，测试删除定时器中断
+             while(TRUE)
+               {
+               //if(delay_runcar==1) pitMgr_t::remove(*p);//测试不再延迟发车，清除定时器中断
+               prem_flag = mode_flag;
+               run_car(&dmadvpHandle,dispBuffer);
+               //if(prem_flag != mode_flag) break;
+               if(mode_flag != 0x02) break;
+               }
+              delete imageBuffer0;
+              delete &dispBuffer;
+              banmaxian_flag = 0;//斑马线识别标志位
+
+        }break;
+        case 0x03://电磁跑车模式
+                {
+                    MENU_Suspend();
+                    DISP_SSD1306_Fill(0);
+                    SDK_DelayAtLeastUs(5000000,180*1000*1000);
+                    delay_runcar = 0;//延迟发车标志位
+                while(TRUE)
+                 {
+                    prem_flag = mode_flag;
+                    elec_runcar();
+                    DISP_SSD1306_Printf_F6x8(30,5,"%c","elecmode");
+                    //if(prem_flag != mode_flag) break;
+                    if(mode_flag != 0x03) break;
+                  }
+                }
+                    break;
+        default: break;//其他模式，待定
+        }
+        //TODO: 在这里添加车模保护代码
+}//while结束
+
+}//main结束
 
 
+//中断服务函数
+//电机
+IFX_INTERRUPT(cc60_pit_ch0_isr, 0, CCU6_0_CH0_ISR_PRIORITY)
+{
+    enableInterrupts();//开启中断嵌套
 
+    Motor_ctr();
 
-    while(TRUE)
-    {
+    PIT_CLEAR_FLAG(CCU6_0, PIT_CH0);
 
-    }
+}
 
-    //中断服务函数
-    //电机
-    IFX_INTERRUPT(cc60_pit_ch0_isr, 0, CCU6_0_CH0_ISR_PRIORITY)
-    {
-        enableInterrupts();//开启中断嵌套
+//舵机
+IFX_INTERRUPT(cc60_pit_ch1_isr, 0, CCU6_0_CH1_ISR_PRIORITY)
+{
+    enableInterrupts();//开启中断嵌套
 
-        Motor_ctr();
+    servo();
 
-        PIT_CLEAR_FLAG(CCU6_0, PIT_CH0);
+    PIT_CLEAR_FLAG(CCU6_0, PIT_CH1);
 
-    }
+}
+//状态切换
+IFX_INTERRUPT(cc61_pit_ch0_isr, 0, CCU6_1_CH0_ISR_PRIORITY)
+{
+    enableInterrupts();//开启中断嵌套
 
-    //舵机
-    IFX_INTERRUPT(cc60_pit_ch1_isr, 0, CCU6_0_CH1_ISR_PRIORITY)
-    {
-        enableInterrupts();//开启中断嵌套
+    mode_switch();
 
-        servo();
+    PIT_CLEAR_FLAG(CCU6_1, PIT_CH0);
 
-        PIT_CLEAR_FLAG(CCU6_0, PIT_CH1);
+}
+//待定
+/*IFX_INTERRUPT(cc61_pit_ch1_isr, 0, CCU6_1_CH1_ISR_PRIORITY)
+{
+    enableInterrupts();//开启中断嵌套
+    PIT_CLEAR_FLAG(CCU6_1, PIT_CH1);
 
-    }
-    //状态切换
-    IFX_INTERRUPT(cc61_pit_ch0_isr, 0, CCU6_1_CH0_ISR_PRIORITY)
-    {
-        enableInterrupts();//开启中断嵌套
+}*/
+void CAM_ZF9V034_DmaCallback(edma_handle_t *handle, void *userData, bool transferDone, uint32_t tcds)
+{
+    dmadvp_handle_t *dmadvpHandle = (dmadvp_handle_t*)userData;
+    DMADVP_EdmaCallbackService(dmadvpHandle, transferDone);
+    //TODO: 补完本回调函数
 
-        mode_switch();
-
-        PIT_CLEAR_FLAG(CCU6_1, PIT_CH0);
-
-    }
-    //待定
-    /*IFX_INTERRUPT(cc61_pit_ch1_isr, 0, CCU6_1_CH1_ISR_PRIORITY)
-    {
-        enableInterrupts();//开启中断嵌套
-        PIT_CLEAR_FLAG(CCU6_1, PIT_CH1);
-
-    }*/
+    //TODO: 添加图像处理（转向控制也可以写在这里）
+}
+void run_car(dmadvp_handle_t *dmadvpHandle,disp_ssd1306_frameBuffer_t *dispBuffer)
+{
+    while (kStatus_Success != DMADVP_TransferGetFullBuffer(DMADVP0, dmadvpHandle,&fullBuffer));
+     THRE();
+     image_main();
+     servo_pid();
+     Speed_radio((c_data[0].servo_pwm-c_data[0].servo_mid));
+             dispBuffer->Clear();
+             const uint8_t imageTH = 120;
+             for (int i = 0; i < cameraCfg.imageRow; i += 2)
+             {
+                 int16_t imageRow = i >> 1;//除以2 为了加速;
+                 for (int j = 0; j < cameraCfg.imageCol; j += 2)
+                 {
+                     int16_t dispCol = j >> 1;
+                     if (IMG[i][j]>imageTH)//fullBuffer[i * cameraCfg.imageCol + j] >
+                     {
+                         dispBuffer->SetPixelColor(dispCol, imageRow, 1);
+                     }
+                 }
+             }
+             DISP_SSD1306_BufferUpload((uint8_t*) dispBuffer);
+             DMADVP_TransferSubmitEmptyBuffer(DMADVP0, dmadvpHandle, fullBuffer);
+             DMADVP_TransferStart(DMADVP0, dmadvpHandle);
+}
+void elec_runcar(void)//电磁跑车函数
+{
+    servo_pid();
+}
+void mode_switch(void)//模式切换中断回调函数
+{
+    (GPIO_PinRead(GPIOA, 9) == 0)? ((*p_mflag) |= 0x01):((*p_mflag) &= 0xfe);
+    (GPIO_PinRead(GPIOA,11) == 0)? ((*p_mflag) |= 0x02):((*p_mflag) &= 0xfd);
+    (GPIO_PinRead(GPIOA,13) == 0)? ((*p_mflag) |= 0x04):((*p_mflag) &= 0xfb);
+    (GPIO_PinRead(GPIOA,15) == 0)? ((*p_mflag) |= 0x08):((*p_mflag) &= 0xf7);
 }
 
 #pragma section all restore

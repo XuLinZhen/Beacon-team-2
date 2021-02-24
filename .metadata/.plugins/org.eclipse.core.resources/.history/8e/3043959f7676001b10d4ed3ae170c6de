@@ -164,8 +164,8 @@ void MenuPrint(MenuItem_t *Menu, MenuItem_t *currItem)  //再加一项当前指针
 {
     DISP_SSD1306_Fill(0);
     int x = 0, y = 2;   //菜单项在y = 2开始
-    SmartCar_OLED_Printf6x8(0, 0,"%s     %d/%d", Menu->Item_name,currItem->list_ID, Menu->Item_data->dataint);
-    SmartCar_OLED_Printf6x8(0, 1,"---------------------");
+    DISP_SSD1306_Printf_F6x8(0, 0,"%s     %d/%d", Menu->Item_name,currItem->list_ID, Menu->Item_data->dataint);
+    DISP_SSD1306_Printf_F6x8(0, 1,"---------------------");
     int start_print_ID;
     MenuItem_t *pctrl = Menu->Child_list;
     start_print_ID = currItem->list_ID <= 6? 1:currItem->list_ID - 5;   //滚动式菜单，
@@ -176,21 +176,21 @@ void MenuPrint(MenuItem_t *Menu, MenuItem_t *currItem)  //再加一项当前指针
     while (pctrl != NULL && y <= 7)
     {
         if (pctrl->Item_type == listType)
-            SmartCar_OLED_Printf6x8(6, y,"[%s]", pctrl->Item_name);
+            DISP_SSD1306_Printf_F6x8(6, y,"[%s]", pctrl->Item_name);
         else if (pctrl->Item_type == intType)
         {
-            SmartCar_OLED_Printf6x8(6, y,"%s", pctrl->Item_name);
-            SmartCar_OLED_Printf6x8(66, y,"%3d", pctrl->Item_data->dataint);
+            DISP_SSD1306_Printf_F6x8(6, y,"%s", pctrl->Item_name);
+            DISP_SSD1306_Printf_F6x8(66, y,"%3d", pctrl->Item_data->dataint);
         }
         else if (pctrl->Item_type == floatType)
         {
-            SmartCar_OLED_Printf6x8(6, y,"%s", pctrl->Item_name);
-            SmartCar_OLED_Printf6x8(66, y,"%3.4f", pctrl->Item_data->datafloat);
+            DISP_SSD1306_Printf_F6x8(6, y,"%s", pctrl->Item_name);
+            DISP_SSD1306_Printf_F6x8(66, y,"%3.4f", pctrl->Item_data->datafloat);
         }
         y++;
         pctrl = pctrl->Next_item;
     }
-    SmartCar_OLED_Printf6x8(0, currItem->list_ID + 1 >= 7? 7: currItem->list_ID + 1,">");
+    DISP_SSD1306_Printf_F6x8(0, currItem->list_ID + 1 >= 7? 7: currItem->list_ID + 1,">");
 }
 
 
@@ -254,7 +254,9 @@ MenuItem_t *ButtonProcess(MenuItem_t *Menu, MenuItem_t* currItem)
                 da[6]=c_data[0].servo_mid;
                 da[7]=threshold;*/
                 memcpy(&buff[0], CAR, sizeof(Car_data) * Max_Item_Amount);
-                Date_Write(0,8,buff);
+                FLASH_SectorWrite(0, buff);
+                //Date_Write();
+                //currItem = IntoMenu(currItem);
                 MenuPrint(Menu, currItem);
                 c_data[0].M_Kp=CAR[3].datafloat;
                 c_data[0].M_Ki=CAR[4].datafloat;
@@ -348,8 +350,8 @@ void ItemPrint(MenuItem_t *currItem, int pos, int *data_array, int length)
     DISP_SSD1306_Fill(0);
     int max_digit = length;//sizeof(data_array) / sizeof(int32_t);
 
-    SmartCar_OLED_Printf6x8(0, 0,"  %s   [%d,%d]", currItem->Item_name, currItem->data_range[min], currItem->data_range[max]);
-    SmartCar_OLED_Printf6x8(0, 1,"---------------------");
+    DISP_SSD1306_Printf_F6x8(0, 0,"  %s   [%d,%d]", currItem->Item_name, currItem->data_range[min], currItem->data_range[max]);
+    DISP_SSD1306_Printf_F6x8(0, 1,"---------------------");
 
     int i;
     for(i = 0; i < max_digit; i++)
@@ -359,40 +361,40 @@ void ItemPrint(MenuItem_t *currItem, int pos, int *data_array, int length)
         {
             if(i==(max_digit-4))
             {
-                SmartCar_OLED_Printf6x8(42 + i*6, 3, ".");
-                SmartCar_OLED_Printf6x8(42 + (i+1)*6, 3, "%d", data_array[i]);
+                DISP_SSD1306_Printf_F6x8(42 + i*6, 3, ".");
+                DISP_SSD1306_Printf_F6x8(42 + (i+1)*6, 3, "%d", data_array[i]);
                 flag=1;
             }
             else
             {
                 if(flag==1)
                 {
-                    SmartCar_OLED_Printf6x8(42 + (i+1)*6, 3, "%d", data_array[i]);
+                    DISP_SSD1306_Printf_F6x8(42 + (i+1)*6, 3, "%d", data_array[i]);
                 }
                 else
                 {
-                    SmartCar_OLED_Printf6x8(42 + i*6, 3, "%d", data_array[i]);
+                    DISP_SSD1306_Printf_F6x8(42 + i*6, 3, "%d", data_array[i]);
                 }
             }
         }
         else if(currItem->Item_type == intType)
         {
-            SmartCar_OLED_Printf6x8(42 + i*6, 3, "%d", data_array[i]);     //显示各个数位
+            DISP_SSD1306_Printf_F6x8(42 + i*6, 3, "%d", data_array[i]);     //显示各个数位
         }
     }
-    SmartCar_OLED_Printf6x8(12, 7, "[OK]");
-    SmartCar_OLED_Printf6x8(60, 7, "[Cancel]");
+    DISP_SSD1306_Printf_F6x8(12, 7, "[OK]");
+    DISP_SSD1306_Printf_F6x8(60, 7, "[Cancel]");
     if  (pos == max_digit + 1)
     {
-        SmartCar_OLED_Printf6x8(6, 7, ">");
+        DISP_SSD1306_Printf_F6x8(6, 7, ">");
     }
     else if (pos == max_digit + 2)
     {
-        SmartCar_OLED_Printf6x8(54, 7, ">");
+        DISP_SSD1306_Printf_F6x8(54, 7, ">");
     }
     else
     {
-        SmartCar_OLED_Printf6x8(42 + (pos-1)*6, 4, "^");
+        DISP_SSD1306_Printf_F6x8(42 + (pos-1)*6, 4, "^");
     }
     int Item_dataint = ArrayToDataint(data_array, max_digit);
     /*switch (currItem->ID)
@@ -527,19 +529,83 @@ int ArrayToDataint(int *data_array, int length)
     return Item_dataint;
 }
 
-void Date_Read(uint32 sector_num,uint32 page_num,uint8 buff[])
+void Date_Read(int sector_num,int page_num,uint8 buff[])
 {
     for(int i=0;i<page_num;i++)
     {
         buff[i]=Page_Read(sector_num,i,uint8);
     }
+
 }
-void Date_Write(uint32 sector_num,uint32 page_num,uint8 buff[])
+void Date_Write()
 {
-    Sector_Erase(sector_num);
-    for(int i=0;i<page_num;i++)
-        {
-            Page_Program(sector_num,i, buff[i]);
-        }
+    /*da[0]=Motor_Kp->Item_data->datafloat;
+    da[1]=Motor_Ki->Item_data->datafloat;
+    da[2]=Motor_Speed->Item_data->datafloat;
+    da[3]=Mora_flag->Item_data->datafloat;
+    da[4]=Servo_Kp->Item_data->datafloat;
+    da[5]=Servo_Kd->Item_data->datafloat;
+    da[6]=Servo_Mid->Item_data->datafloat;
+    da[7]=Threshold->Item_data->dataint;*/
+    //int length=sizeof(write)/sizeof(float);
+    //float* date=(float*)malloc(sizeof(float)*4096);
+    //FLASH_SectorRead(sector,date);
+    memcpy(&buff[0],da,8*sizeof(float));
+    Error=FLASH_SectorWrite(0,buff);
+    //free(date);
 }
+//PID参数调节的单独程序，实现较复杂，因为发现了更简单的方案，所以没有完成
+//
+//MenuItem_t* PIDAdjust(MenuItem_t* currItem)
+//{
+//    currItem = IntoMenu(currItem);
+//    while (true)
+//    {
+//        int32_t button_order = ButtonRead();
+//        switch (button_order)
+//        {
+//            case up:
+//                currItem = CursorMove_up(currItem);
+//                MenuPrint(Menu, currItem);
+//                break;
+//            case down:
+//                currItem = CursorMove_down(currItem);
+//                MenuPrint(Menu, currItem);
+//                break;
+//            case OK:
+//                if (currItem->list_ID == 1)
+//                {
+//                    currItem = IntoMenu(currItem);
+//                    return currItem;
+//                }
+//                else if (currItem->Item_type == listType)
+//                    currItem = IntoMenu(currItem);
+//                else  currItem = DataModify(currItem);
+//                break;
+//            case left:
+//                if (currItem->list_ID == 4 && currItem->Item_data->dataint > 1) //Gear
+//                {
+//                    currItem->Item_data->dataint--;
+//                    //修改档位相关操作
+//                    MenuPrint(Menu, currItem);
+//                }
+//                break;
+//            case right:
+//                if (currItem->list_ID == 4 && currItem->Item_data->dataint < 2) //加新的PID档位改这里的2
+//                {
+//                    currItem->Item_data->dataint++;
+//                    //修改档位相关操作
+//                    MenuPrint(Menu, currItem);
+//                }
+//                break;
+//            default:
+//                break;
+//        }
+//    }
+//
+//}
+
+
+
+
 
