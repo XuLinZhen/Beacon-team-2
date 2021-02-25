@@ -9,7 +9,7 @@
 
 #include "Control.hpp"
 
-bool delay_runcar = 0;//延迟发车标志位
+int delay_runcar = 0;//延迟发车标志位
 float error_n = 0;      //舵机偏差
 float error_n_1 = 0;    //舵机前一次偏差
 int mot_left = 0;  //电机左轮编码器读取

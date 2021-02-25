@@ -81,9 +81,9 @@ typedef struct MenuItem_t
     int         ID;                     //菜单项总序号
     int         data_range[2];          //数据上下限
     Car_data   *Item_data;              //数据指针，指向结构体
-    MenuItem_t *Pre_item;               //前一个节点指针
-    MenuItem_t *Next_item;              //后一个节点指针
-    MenuItem_t *Child_list;             //子菜单第一项的指针（只有菜单项类型是listType时才非空）
+    struct MenuItem_t *Pre_item;               //前一个节点指针
+    struct MenuItem_t *Next_item;              //后一个节点指针
+    struct MenuItem_t *Child_list;             //子菜单第一项的指针（只有菜单项类型是listType时才非空）
     char        Item_name[name_size];   //菜单项名称，屏幕显示
 }MenuItem_t;
 
