@@ -9,7 +9,7 @@
 
 #include "image.h"
 #include "my_math.h"
-#include "Control.hpp"
+#include "team_ctr.h"
 int f[10 * CAMERA_H];//考察连通域联通性
 int flag=-1;
 int light_flag[10]={0};

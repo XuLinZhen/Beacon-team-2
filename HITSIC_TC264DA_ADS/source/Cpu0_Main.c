@@ -38,7 +38,7 @@
 #include "SmartCar_Systick.h"
 #include "common.h"
 
-#include "Control.hpp"
+#include "team_ctr.h"
 #include "Electric.hpp"
 #include "image.h"
 #include "my_math.h"

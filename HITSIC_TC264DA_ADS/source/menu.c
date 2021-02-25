@@ -7,7 +7,7 @@
 
 #include "SmartCar_GPIO.h"
 #include"menu.h"
-#include"Control.hpp"
+#include"team_ctr.h"
 #include"image.h"
 
 int Error;
