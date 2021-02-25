@@ -28,7 +28,6 @@
 #include "IfxCpu.h"
 #include <ifxCpu_Irq.h>
 #include "IfxScuWdt.h"
-#include "SmartCar_GPIO.h"
 #include "SmartCar_Uart.h"
 #include "SmartCar_Upload.h"
 #include "SmartCar_Oled.h"
@@ -86,16 +85,13 @@ int core0_main(void)
     /* Wait for CPU sync event */
     IfxCpu_emitEvent(&g_cpuSyncEvent);
     IfxCpu_waitEvent(&g_cpuSyncEvent, 1);
-    /** GPIO初始化 */
-    GPIO_Init(P22,0, PUSHPULL,1);
-    GPIO_Init(P22,1, PUSHPULL,1);
-    GPIO_Init(P22,2, PUSHPULL,1);
-    GPIO_Init(P22,3, PUSHPULL,1);
-    /** 定时中断初始化 */
+    
+    //定时中断初始化
     Pit_Init(CCU6_0,PIT_CH0,1000*1000);  //电机
     Pit_Init(CCU6_0,PIT_CH1,3000*1000);  //舵机
     Pit_Init(CCU6_1,PIT_CH0,7000*1000);  //状态切换
     //Pit_Init(CCU6_1,PIT_CH1,1000*1000);  //待定
+
     /** 初始化OLED屏幕 */
     SmartCar_Oled_Init();
     extern uint8 DISP_image_100thAnniversary[8][128];
@@ -132,6 +128,7 @@ while(TRUE)
         {
             MenuPrint(MenuRoot, currItem);                  //构建菜单并打印
             //当标志位为0时:
+            //MENU_Resume();   //菜单恢复
             delay_runcar = 0;  //延迟发车标志位置为0
             while(TRUE)
             {
@@ -201,7 +198,7 @@ while(TRUE)
                  {
                     prem_flag = mode_flag;
                     elec_runcar();
-                    SmartCar_OLED_Printf6x8(30,5,"%c","elecmode");
+                    DISP_SSD1306_Printf_F6x8(30,5,"%c","elecmode");
                     //if(prem_flag != mode_flag) break;
                     if(mode_flag != 0x03) break;
                   }
@@ -293,10 +290,10 @@ void elec_runcar(void)//电磁跑车函数
 }
 void mode_switch(void)//模式切换中断回调函数
 {
-    (GPIO_PinRead(P33, 12) == 0)? ((*p_mflag) |= 0x01):((*p_mflag) &= 0xfe);
-    (GPIO_PinRead(P33, 13) == 0)? ((*p_mflag) |= 0x02):((*p_mflag) &= 0xfd);
-    //(GPIO_PinRead(GPIOA,13) == 0)? ((*p_mflag) |= 0x04):((*p_mflag) &= 0xfb);
-    //(GPIO_PinRead(GPIOA,15) == 0)? ((*p_mflag) |= 0x08):((*p_mflag) &= 0xf7);
+    (GPIO_PinRead(GPIOA, 9) == 0)? ((*p_mflag) |= 0x01):((*p_mflag) &= 0xfe);
+    (GPIO_PinRead(GPIOA,11) == 0)? ((*p_mflag) |= 0x02):((*p_mflag) &= 0xfd);
+    (GPIO_PinRead(GPIOA,13) == 0)? ((*p_mflag) |= 0x04):((*p_mflag) &= 0xfb);
+    (GPIO_PinRead(GPIOA,15) == 0)? ((*p_mflag) |= 0x08):((*p_mflag) &= 0xf7);
 }
 
 #pragma section all restore

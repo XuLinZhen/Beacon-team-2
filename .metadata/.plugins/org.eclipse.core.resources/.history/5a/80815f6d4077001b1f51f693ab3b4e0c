@@ -5,7 +5,7 @@
  *      Author: Administrator
  */
 
-#include "SmartCar_GPIO.h"
+
 #include"menu.h"
 #include"Control.hpp"
 #include"image.h"
@@ -202,15 +202,15 @@ int ButtonRead(void)
     {
         button_operation = up;
     }
-    if (!GPIO_Read(P22,1))
+    if (!GPIO_Read(GPIOE, 7))
     {
         button_operation = down;
     }
-    if (!GPIO_Read(P22,2))
+    if (!GPIO_Read(GPIOE, 9))
     {
         button_operation = left;
     }
-    if (!GPIO_Read(P22,3))
+    if (!GPIO_Read(GPIOE, 8))
     {
         button_operation = right;
     }
@@ -344,7 +344,7 @@ MenuItem_t *GetRoot(MenuItem_t *currItem)       //获取当前操作的菜单项所属的菜单
  */
 void ItemPrint(MenuItem_t *currItem, int pos, int *data_array, int length)
 {
-    int flag=0;
+    bool flag=0;
     DISP_SSD1306_Fill(0);
     int max_digit = length;//sizeof(data_array) / sizeof(int32_t);
 
