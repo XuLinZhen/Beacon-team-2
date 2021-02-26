@@ -38,7 +38,7 @@
 
 extern uint8 IMG[CAMERA_H][CAMERA_W];//二值化后图像数组
 extern uint8 image_Buffer_0[CAMERA_H][CAMERA_W];
-extern uint8* fullBuffer;//指向灰度图的首地址
+extern uint8* camera_buffer_addr;//指向灰度图的首地址
 extern int threshold;
 extern int foresight;
 extern uint8 banmaxian_flag;
@@ -59,14 +59,7 @@ float get_error(void);
 
 void my_memset(uint8* ptr, uint8 num, uint8 size);
 
-void search_rightup_point();
-void  search_leftup_point();
-void search_rightdown_point();
-void search_leftdown_point();
-void connect_line_plan();
-void connect_line(int x1, int y1, int x2, int y2,uint8 flag);
-float check_k(int line, uint8* array, int length, int flag);
-void find_cross();
+
 void banmaxian(int zebra);
 void ckeck_out_road();
 //信标
