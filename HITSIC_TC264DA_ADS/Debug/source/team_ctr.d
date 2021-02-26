@@ -22,3 +22,5 @@ team_ctr.o :	../SmartCar/common.h
 ../SmartCar/common.h :
 team_ctr.o :	../source/team_elec.h
 ../source/team_elec.h :
+team_ctr.o :	../SmartCar/common.h
+../SmartCar/common.h :

@@ -34,5 +34,7 @@ menu.o :	../SmartCar/common.h
 ../SmartCar/common.h :
 menu.o :	../source/team_elec.h
 ../source/team_elec.h :
+menu.o :	../SmartCar/common.h
+../SmartCar/common.h :
 menu.o :	../source/image.h
 ../source/image.h :

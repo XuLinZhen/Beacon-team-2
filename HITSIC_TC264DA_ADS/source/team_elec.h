@@ -8,7 +8,7 @@
 #ifndef SOURCE_TEAM_ELEC_H_
 #define SOURCE_TEAM_ELEC_H_
 
-//#include "hitsic_common.h"
+#include "common.h"
 //#include "sc_adc.h"
 #define MinLVGot 10
 #define SampleTimes 16

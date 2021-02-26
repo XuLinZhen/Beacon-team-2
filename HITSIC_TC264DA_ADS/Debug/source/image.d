@@ -26,3 +26,5 @@ image.o :	../source/image.h
 ../source/image.h :
 image.o :	../source/team_elec.h
 ../source/team_elec.h :
+image.o :	../SmartCar/common.h
+../SmartCar/common.h :
