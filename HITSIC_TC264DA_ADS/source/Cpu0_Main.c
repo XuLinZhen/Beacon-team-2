@@ -66,10 +66,10 @@ int mode_flag = 0;//状态切换标志位变量
 int *p_mflag = NULL;//状态切换指针
 int prem_flag = 0;//状态切换标志位变量2，previous标志位
 
-void run_car(dmadvp_handle_t *dmadvpHandle,disp_ssd1306_frameBuffer_t *dispBuffer);//摄像头跑车函数
+//void run_car(dmadvp_handle_t *dmadvpHandle,disp_ssd1306_frameBuffer_t *dispBuffer);//摄像头跑车函数
 void elec_runcar(void);//电磁跑车函数
 void mode_switch(void);//模式切换中断回调函数
-void CAM_ZF9V034_DmaCallback(edma_handle_t *handle, void *userData, bool transferDone, uint32 tcds);//摄像头初始化回调函数
+
 
 int core0_main(void)
 {
@@ -159,20 +159,8 @@ while(TRUE)
         break;
         case 0x02://摄像头跑车模式
         {
-            //pitMgr_t *p;//测试删除定时器中断
-            //MENU_Suspend();               //菜单挂起
+
             SmartCar_OLED_Fill(0);
-            /*CAM_ZF9V034_GetDefaultConfig(&cameraCfg);                                   //设置摄像头配置
-            CAM_ZF9V034_CfgWrite(&cameraCfg);                                   //写入配置
-            CAM_ZF9V034_GetReceiverConfig(&dmadvpCfg, &cameraCfg);    //生成对应接收器的配置数据，使用此数据初始化接受器并接收图像数据。
-            DMADVP_Init(DMADVP0, &dmadvpCfg);
-            DMADVP_TransferCreateHandle(&dmadvpHandle, DMADVP0,CAM_ZF9V034_DmaCallback);
-            uint8_t *imageBuffer0 = new uint8_t[DMADVP0->imgSize];
-            dispBuffer = new disp_ssd1306_frameBuffer_t;
-            //uint8_t *imageBuffer1 = new uint8_t[DMADVP0->imgSize];
-             DMADVP_TransferSubmitEmptyBuffer(DMADVP0, &dmadvpHandle, imageBuffer0);
-             //DMADVP_TransferSubmitEmptyBuffer(DMADVP0, &dmadvpHandle, imageBuffer1);
-             DMADVP_TransferStart(DMADVP0, &dmadvpHandle);*/
             SmartCar_MT9V034_Init();
 
              Motorsp_Init();//电机速度初始化
@@ -183,13 +171,17 @@ while(TRUE)
                {
                //if(delay_runcar==1) pitMgr_t::remove(*p);//测试不再延迟发车，清除定时器中断
                prem_flag = mode_flag;
-               run_car(&dmadvpHandle,dispBuffer);
+               while (!mt9v034_finish_flag){}
+               mt9v034_finish_flag = 0;
+               THRE();
+               image_main();
+               servo_pid();
+               Speed_radio((c_data[0].servo_pwm-c_data[0].servo_mid));
+               SmartCar_Show_IMG((uint8*) mt9v034_image, 120, 188);
                //if(prem_flag != mode_flag) break;
                if(mode_flag != 0x02) break;
                }
-              //delete imageBuffer0;
-              //delete &dispBuffer;
-              banmaxian_flag = 0;//斑马线识别标志位
+              //banmaxian_flag = 0;//斑马线识别标志位
 
         }break;
         case 0x03://电磁跑车模式
@@ -255,39 +247,10 @@ IFX_INTERRUPT(cc61_pit_ch0_isr, 0, CCU6_1_CH0_ISR_PRIORITY)
     PIT_CLEAR_FLAG(CCU6_1, PIT_CH1);
 
 }*/
-void CAM_ZF9V034_DmaCallback(edma_handle_t *handle, void *userData, bool transferDone, uint32 tcds)
+/*void run_car(dmadvp_handle_t *dmadvpHandle,disp_ssd1306_frameBuffer_t *dispBuffer)
 {
-    dmadvp_handle_t *dmadvpHandle = (dmadvp_handle_t*)userData;
-    DMADVP_EdmaCallbackService(dmadvpHandle, transferDone);
-    //TODO: 补完本回调函数
 
-    //TODO: 添加图像处理（转向控制也可以写在这里）
-}
-void run_car(dmadvp_handle_t *dmadvpHandle,disp_ssd1306_frameBuffer_t *dispBuffer)
-{
-    while (kStatus_Success != DMADVP_TransferGetFullBuffer(DMADVP0, dmadvpHandle,&fullBuffer));
-     THRE();
-     image_main();
-     servo_pid();
-     Speed_radio((c_data[0].servo_pwm-c_data[0].servo_mid));
-             dispBuffer->Clear();
-             const uint8_t imageTH = 120;
-             for (int i = 0; i < cameraCfg.imageRow; i += 2)
-             {
-                 int16_t imageRow = i >> 1;//除以2 为了加速;
-                 for (int j = 0; j < cameraCfg.imageCol; j += 2)
-                 {
-                     int16_t dispCol = j >> 1;
-                     if (IMG[i][j]>imageTH)//fullBuffer[i * cameraCfg.imageCol + j] >
-                     {
-                         dispBuffer->SetPixelColor(dispCol, imageRow, 1);
-                     }
-                 }
-             }
-             DISP_SSD1306_BufferUpload((uint8_t*) dispBuffer);
-             DMADVP_TransferSubmitEmptyBuffer(DMADVP0, dmadvpHandle, fullBuffer);
-             DMADVP_TransferStart(DMADVP0, dmadvpHandle);
-}
+}*/
 void elec_runcar(void)//电磁跑车函数
 {
     servo_pid();

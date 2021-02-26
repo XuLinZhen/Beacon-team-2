@@ -18,3 +18,5 @@ team_ctr.o :	../Libraries/Service/CpuGeneric/SysSe/Bsp/Bsp.h
 ../Libraries/Service/CpuGeneric/SysSe/Bsp/Bsp.h :
 team_ctr.o :	../source/image.h
 ../source/image.h :
+team_ctr.o :	../SmartCar/common.h
+../SmartCar/common.h :
