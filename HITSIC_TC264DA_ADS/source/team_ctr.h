@@ -11,7 +11,7 @@
 #include "common.h"
 //#include "sc_ftm.h"
 #include "image.h"
-//#include "Electric.hpp"
+#include "team_elec.h"
 #include "math.h"
 //#include"sc_host.h"
 

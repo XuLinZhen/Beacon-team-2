@@ -6,15 +6,6 @@
  */
 
 
-/*
- * Control.c
- *
- *  Created on: 2021年2月23日
- *      Author: Administrator
- */
-
-
-
 #include "team_ctr.h"
 
 int delay_runcar = 0;//延迟发车标志位

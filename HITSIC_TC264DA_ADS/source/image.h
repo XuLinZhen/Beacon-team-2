@@ -13,6 +13,7 @@
 //#include "cv.h"
 //#include "highgui.h"
 #include <math.h>
+#include "common.h"
 //#include "image.h"
 
 //#define MISS 94

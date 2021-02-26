@@ -21,7 +21,7 @@
 
 extern int32 Item_ID;
 extern uint8 *buff;
-extern uint8 Error;
+//extern uint8 Error;
 
 typedef enum item_type          //菜单项类型
 {

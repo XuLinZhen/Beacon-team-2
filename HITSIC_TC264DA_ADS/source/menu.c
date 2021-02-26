@@ -10,9 +10,9 @@
 #include"team_ctr.h"
 #include"image.h"
 
-int Error;
+//uint8 Error;
 
-MenuItem_t *ItemCreate(char* Item_name, itemType Item_Type, int data_min, int data_max)
+MenuItem_t *ItemCreate(char* Item_name, itemType Item_Type, int32 data_min, int32 data_max)
 {
     MenuItem_t* pItem = (MenuItem_t*)malloc(sizeof(MenuItem_t));  //开内存，创建一个新的菜单项结构体 pItem
     pItem->Item_type = Item_Type;            //为新建立的菜单结构体 类型赋值
@@ -501,7 +501,7 @@ MenuItem_t *DataModify(MenuItem_t *currItem)
 }
 
 
-int DataCheck(MenuItem_t *currItem, int32 Item_dataint)
+int32 DataCheck(MenuItem_t *currItem, int32 Item_dataint)
 {
     if (currItem->Item_type == intType)
     {
@@ -515,7 +515,7 @@ int DataCheck(MenuItem_t *currItem, int32 Item_dataint)
     }
 }
 
-int ArrayToDataint(int32 *data_array, int32 length)
+int32 ArrayToDataint(int32 *data_array, int32 length)
 {
     int Item_dataint = 0;
     int max_digit = length;

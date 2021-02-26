@@ -39,7 +39,7 @@
 #include "common.h"
 
 #include "team_ctr.h"
-#include "Electric.hpp"
+#include "team_elec.h"
 #include "image.h"
 #include "my_math.h"
 #include "menu.h"
