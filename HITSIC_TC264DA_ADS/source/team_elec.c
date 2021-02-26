@@ -6,17 +6,9 @@
  */
 
 
-/*
- * Electric.cpp
- *
- *  Created on: 2021年2月23日
- *      Author: Administrator
- */
-
-
 #include "team_elec.h"
 
-int ADC[8];//两个AD通道读取电感值
+uint32 ADC[8];//两个AD通道读取电感值
 int LV_Temp[2][SampleTimes];//电感处理函数
 float LV[2]={0,0};//数组
 float AD[2]={0,0};//保存滤波后数据数组

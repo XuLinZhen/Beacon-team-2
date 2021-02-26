@@ -28,3 +28,6 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64 -perspective com.infin
 
 !ENTRY org.eclipse.cdt.core 1 0 2021-02-26 19:13:50.742
 !MESSAGE Indexed 'HITSIC_TC264DA_ADS' (119 sources, 365 headers) in 21.4 sec: 105,426 declarations; 71,623 references; 3 unresolved inclusions; 1,726 syntax errors; 5,243 unresolved names (2.9%)
+
+!ENTRY org.eclipse.cdt.core 1 0 2021-02-26 19:29:57.623
+!MESSAGE Indexed 'HITSIC_TC264DA_ADS' (119 sources, 364 headers) in 12.9 sec: 105,408 declarations; 71,629 references; 3 unresolved inclusions; 1,726 syntax errors; 5,238 unresolved names (2.9%)

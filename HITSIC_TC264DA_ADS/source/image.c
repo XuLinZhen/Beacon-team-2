@@ -586,7 +586,7 @@ float check_k(int line, uint8* array, int length, int flag)
     return k;
 }
 //两点连线，flag是标志位
-void  connect_line(int x1, int y1, int x2, int y2,uint8 array[120])
+void connect_line(int x1, int y1, int x2, int y2,uint8 array[120])
 {
     float k, b; int x;
     point line_point;

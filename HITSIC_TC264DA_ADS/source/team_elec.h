@@ -12,7 +12,7 @@
 //#include "sc_adc.h"
 #define MinLVGot 10
 #define SampleTimes 16
-extern int ADC[8];
+extern uint32 ADC[8];
 extern float AD[2];
 
 /**********************************************************************************************************************

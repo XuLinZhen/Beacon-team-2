@@ -1,8 +1,0 @@
-################################################################################
-# Automatically-generated file. Do not edit!
-################################################################################
-
-Electric.o :	../source/Electric.cpp
-../source/Electric.cpp :
-Electric.o :	../source/Electric.hpp
-../source/Electric.hpp :
