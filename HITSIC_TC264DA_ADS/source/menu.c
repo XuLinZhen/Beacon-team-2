@@ -222,7 +222,7 @@ int ButtonRead(void)
 }
 
 
-void delay(int i)
+void delay(uint32 i)
 {
     while(i--);
 }
@@ -342,7 +342,7 @@ MenuItem_t *GetRoot(MenuItem_t *currItem)       //获取当前操作的菜单项所属的菜单
  * @ （特殊项）相关参数实时显示
  * @  [ O K ]     >[C a n c e l]
  */
-void ItemPrint(MenuItem_t *currItem, int pos, int *data_array, int length)
+void ItemPrint(MenuItem_t *currItem, int32 pos, int32 *data_array, int32 length)
 {
     int flag=0;
     DISP_SSD1306_Fill(0);
@@ -501,7 +501,7 @@ MenuItem_t *DataModify(MenuItem_t *currItem)
 }
 
 
-int DataCheck(MenuItem_t *currItem, int Item_dataint)
+int DataCheck(MenuItem_t *currItem, int32 Item_dataint)
 {
     if (currItem->Item_type == intType)
     {
@@ -515,7 +515,7 @@ int DataCheck(MenuItem_t *currItem, int Item_dataint)
     }
 }
 
-int ArrayToDataint(int *data_array, int length)
+int ArrayToDataint(int32 *data_array, int32 length)
 {
     int Item_dataint = 0;
     int max_digit = length;

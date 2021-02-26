@@ -19,9 +19,9 @@
 #define Max_Item_Amount 30      //菜单项的最大个数
 #define delay_time 2000000
 
-extern int Item_ID;
-extern int *buff;
-extern int Error;
+extern int32 Item_ID;
+extern uint8 *buff;
+extern uint8 Error;
 
 typedef enum item_type          //菜单项类型
 {
@@ -77,9 +77,9 @@ extern Car_data CAR[Max_Item_Amount];  //数据结构体，包含整形和浮点型
 typedef struct MenuItem_t
 {
     itemType    Item_type;              //菜单项类型
-    int         list_ID;                //菜单项在其直属菜单中的序号
-    int         ID;                     //菜单项总序号
-    int         data_range[2];          //数据上下限
+    uint32         list_ID;                //菜单项在其直属菜单中的序号
+    uint32         ID;                     //菜单项总序号
+    uint32         data_range[2];          //数据上下限
     Car_data   *Item_data;              //数据指针，指向结构体
     struct MenuItem_t *Pre_item;               //前一个节点指针
     struct MenuItem_t *Next_item;              //后一个节点指针
@@ -100,24 +100,24 @@ void MenuPrint(MenuItem_t *Menu, MenuItem_t *currItem);
 /**
  * @brief : 延时函数
  */
-void delay(int i);
+void delay(uint32 i);
 
 /**
  * @brief : 根据需要打印菜单项currItem，修改参数时用
  * @pos:光标位置；
  * @data_array:菜单项数据按位拆分成数组
  */
-void ItemPrint(MenuItem_t *currItem, int pos, int *data_array, int length);
+void ItemPrint(MenuItem_t *currItem, int32 pos, int32 *data_array, int32 length);
 
 /**
  * @brief : 数据改完之后检查是否在正常范围内
  */
-int DataCheck(MenuItem_t *currItem, int Item_dataint);
+int32 DataCheck(MenuItem_t *currItem, int32 Item_dataint);
 
 /**
  * @brief : 把按位拆分成的数组还原成数据
  */
-int ArrayToDataint(int *data_array, int length);
+int32 ArrayToDataint(int32 *data_array, int32 length);
 
 /**
  * @brief : 建立菜单树
@@ -131,7 +131,7 @@ MenuItem_t *MenuCreate(void);
  * @data_min: 菜单项数据的最小值
  * @data_max: 菜单项数据的最大值
  */
-MenuItem_t *ItemCreate(char* Item_name, itemType Item_Type, int data_min, int data_max);
+MenuItem_t *ItemCreate(char* Item_name, itemType Item_Type, int32 data_min, int32 data_max);
 
 /**
  * @brief : 按键动作处理，调用其它数据处理函数，在主函数无限循环中被调用

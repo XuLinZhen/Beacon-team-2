@@ -35,13 +35,13 @@
 #define purple 0x06
 ///////////////////////////
 
-extern int IMG[CAMERA_H][CAMERA_W];//二值化后图像数组
-extern int image_Buffer_0[CAMERA_H][CAMERA_W];
-extern int* fullBuffer;//指向灰度图的首地址
+extern uint8 IMG[CAMERA_H][CAMERA_W];//二值化后图像数组
+extern uint8 image_Buffer_0[CAMERA_H][CAMERA_W];
+extern uint8* fullBuffer;//指向灰度图的首地址
 extern int threshold;
 extern int foresight;
-extern int banmaxian_flag;
-extern int out_flag;
+extern uint8 banmaxian_flag;
+extern uint8 out_flag;
 extern int zebra;
 
 void head_clear(void);
@@ -50,13 +50,13 @@ int find_f(int a);
 void search_white_range();
 void find_all_connect();
 void find_road();
-int find_continue(int i_start, int j_start);
+uint8 find_continue(uint8 i_start, uint8 j_start);
 void ordinary_two_line(void);
 void image_main();
 void get_mid_line(void);
 float get_error(void);
 
-void my_memset(int* ptr, int num, int size);
+void my_memset(uint8* ptr, uint8 num, uint8 size);
 
 void search_rightup_point();
 void  search_leftup_point();
@@ -64,7 +64,7 @@ void search_rightdown_point();
 void search_leftdown_point();
 void connect_line_plan();
 void  connect_line(int x1, int y1, int x2, int y2,int flag);
-float check_k(int line, int* array, int length, int flag);
+float check_k(int line, uint8* array, int length, int flag);
 void find_cross();
 void banmaxian(int zebra);
 void ckeck_out_road();

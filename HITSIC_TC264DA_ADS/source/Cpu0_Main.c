@@ -56,12 +56,12 @@ Car_data CAR[Max_Item_Amount];
 
 int *buff;
 
-cam_zf9v034_configPacket_t cameraCfg;
-dmadvp_config_t dmadvpCfg;
-dmadvp_handle_t dmadvpHandle;
-disp_ssd1306_frameBuffer_t *dispBuffer;
-inv::i2cInterface_t imu_i2c(nullptr, IMU_INV_I2cRxBlocking, IMU_INV_I2cTxBlocking);
-inv::mpu6050_t imu_6050(imu_i2c);
+//cam_zf9v034_configPacket_t cameraCfg;
+//dmadvp_config_t dmadvpCfg;
+//dmadvp_handle_t dmadvpHandle;
+//disp_ssd1306_frameBuffer_t *dispBuffer;
+//inv::i2cInterface_t imu_i2c(nullptr, IMU_INV_I2cRxBlocking, IMU_INV_I2cTxBlocking);
+//inv::mpu6050_t imu_6050(imu_i2c);
 int mode_flag = 0;//状态切换标志位变量
 int *p_mflag = NULL;//状态切换指针
 int prem_flag = 0;//状态切换标志位变量2，previous标志位
@@ -69,7 +69,7 @@ int prem_flag = 0;//状态切换标志位变量2，previous标志位
 void run_car(dmadvp_handle_t *dmadvpHandle,disp_ssd1306_frameBuffer_t *dispBuffer);//摄像头跑车函数
 void elec_runcar(void);//电磁跑车函数
 void mode_switch(void);//模式切换中断回调函数
-void CAM_ZF9V034_DmaCallback(edma_handle_t *handle, void *userData, bool transferDone, uint32_t tcds);//摄像头初始化回调函数
+void CAM_ZF9V034_DmaCallback(edma_handle_t *handle, void *userData, bool transferDone, uint32 tcds);//摄像头初始化回调函数
 
 int core0_main(void)
 {
@@ -98,7 +98,7 @@ int core0_main(void)
     //Pit_Init(CCU6_1,PIT_CH1,1000*1000);  //待定
     /** 初始化OLED屏幕 */
     SmartCar_Oled_Init();
-    extern uint8 DISP_image_100thAnniversary[8][128];
+    extern const uint8 DISP_image_100thAnniversary[8][128];
     SmartCar_Buffer_Upload((uint8*) DISP_image_100thAnniversary);
     /** 初始化菜单 */
     MenuItem_t* MenuRoot = MenuCreate();
@@ -162,7 +162,7 @@ while(TRUE)
             //pitMgr_t *p;//测试删除定时器中断
             //MENU_Suspend();               //菜单挂起
             SmartCar_OLED_Fill(0);
-            CAM_ZF9V034_GetDefaultConfig(&cameraCfg);                                   //设置摄像头配置
+            /*CAM_ZF9V034_GetDefaultConfig(&cameraCfg);                                   //设置摄像头配置
             CAM_ZF9V034_CfgWrite(&cameraCfg);                                   //写入配置
             CAM_ZF9V034_GetReceiverConfig(&dmadvpCfg, &cameraCfg);    //生成对应接收器的配置数据，使用此数据初始化接受器并接收图像数据。
             DMADVP_Init(DMADVP0, &dmadvpCfg);
@@ -172,7 +172,8 @@ while(TRUE)
             //uint8_t *imageBuffer1 = new uint8_t[DMADVP0->imgSize];
              DMADVP_TransferSubmitEmptyBuffer(DMADVP0, &dmadvpHandle, imageBuffer0);
              //DMADVP_TransferSubmitEmptyBuffer(DMADVP0, &dmadvpHandle, imageBuffer1);
-             DMADVP_TransferStart(DMADVP0, &dmadvpHandle);
+             DMADVP_TransferStart(DMADVP0, &dmadvpHandle);*/
+            SmartCar_MT9V034_Init();
 
              Motorsp_Init();//电机速度初始化
              servo_init(&(c_data[0].servo_pwm));//舵机初始化
@@ -186,8 +187,8 @@ while(TRUE)
                //if(prem_flag != mode_flag) break;
                if(mode_flag != 0x02) break;
                }
-              delete imageBuffer0;
-              delete &dispBuffer;
+              //delete imageBuffer0;
+              //delete &dispBuffer;
               banmaxian_flag = 0;//斑马线识别标志位
 
         }break;
@@ -254,7 +255,7 @@ IFX_INTERRUPT(cc61_pit_ch0_isr, 0, CCU6_1_CH0_ISR_PRIORITY)
     PIT_CLEAR_FLAG(CCU6_1, PIT_CH1);
 
 }*/
-void CAM_ZF9V034_DmaCallback(edma_handle_t *handle, void *userData, bool transferDone, uint32_t tcds)
+void CAM_ZF9V034_DmaCallback(edma_handle_t *handle, void *userData, bool transferDone, uint32 tcds)
 {
     dmadvp_handle_t *dmadvpHandle = (dmadvp_handle_t*)userData;
     DMADVP_EdmaCallbackService(dmadvpHandle, transferDone);

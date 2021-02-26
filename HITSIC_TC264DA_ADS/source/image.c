@@ -17,33 +17,33 @@ int number=0;
 int sum=0;
 //每个白条子属性
 typedef struct {
-    int   left;//左边界
-    int   right;//右边界
-    int   width;
+    uint8   left;//左边界
+    uint8   right;//右边界
+    uint8   width;
     int   connect_num;//连通标记（号）
 }range;
 
 //每行的所有白条子
 typedef struct {
-    int   num;//每行白条数量
+    uint8   num;//每行白条数量
     range   area[white_num_MAX];//该行各白条区域
 }all_range;
 
 //属于赛道的每个白条子属性
 typedef struct {
-    int   left;//左边界
-    int   right;//右边界
-    int   width;//宽度
+    uint8   left;//左边界
+    uint8   right;//右边界
+    uint8   width;//宽度
 }road_range;
 
 typedef struct {
-    int   left;//左边界
-    int   right;//右边界
-    int   width;//宽度
+    uint8   left;//左边界
+    uint8   right;//右边界
+    uint8   width;//宽度
 }light_range;
 //每行属于信标灯的白条子
 typedef struct {
-    int      white_num;
+    uint8      white_num;
     light_range  connected[white_num_MAX];
 }light;
 
@@ -57,32 +57,32 @@ point determined_leftup_point;
 point determined_rightdown_point;
 point determined_rightup_point;
 
-int banmaxian_flag = 0;
-int cross_flag = 0;
-int out_flag= 0;
+uint8 banmaxian_flag = 0;
+uint8 cross_flag = 0;
+uint8 out_flag= 0;
 int zebra = 5;
 
 //每行属于赛道的每个白条子
 typedef struct {
-    int   white_num;
+    uint8   white_num;
     road_range   connected[white_num_MAX];
 }road;
 
 all_range white_range[CAMERA_H];//所有白条子
 road my_road[CAMERA_H];//赛道
-int IMG[CAMERA_H][CAMERA_W];//二值化后图像数组
-int left_line[CAMERA_H], right_line[CAMERA_H];//赛道的左右边界
-int mid_line[CAMERA_H];
+uint8 IMG[CAMERA_H][CAMERA_W];//二值化后图像数组
+uint8 left_line[CAMERA_H], right_line[CAMERA_H];//赛道的左右边界
+uint8 mid_line[CAMERA_H];
 int all_connect_num = 0;//所有白条子数
-int top_road;//赛道最高处所在行数
+uint8 top_road;//赛道最高处所在行数
 int threshold = 215;//阈值
-int* fullBuffer;
+uint8* fullBuffer;
 int foresight = 40;
 light my_light[CAMERA_H];//信标灯
-int centre_h = 0;
-int centre_l = 0;
-int centre_h_pre = 0;
-int centre_l_pre = 0;
+uint8 centre_h = 0;
+uint8 centre_l = 0;
+uint8 centre_h_pre = 0;
+uint8 centre_l_pre = 0;
 ////////////////////////////////////////////
 //功能：二值化
 //输入：灰度图片
@@ -91,8 +91,8 @@ int centre_l_pre = 0;
 ///////////////////////////////////////////
 void THRE()
 {
-    int* map;
-    int* my_map;
+    uint8* map;
+    uint8* my_map;
     map = fullBuffer;
     for (int i = 0; i < 120; i++)
     {
@@ -116,7 +116,7 @@ void THRE()
 ///////////////////////////////////////////
 void head_clear(void)
 {
-    int* my_map;
+    uint8* my_map;
     for (int i = 119; i >= 84; i--)
     {
         my_map = &IMG[i][0];
@@ -148,12 +148,12 @@ int find_f(int node)//返回的是父节点
 ///////////////////////////////////////////
 void search_white_range()
 {
-    int i, j;
+    uint8 i, j;
     int istart = NEAR_LINE;//处理起始行
     int iend = FAR_LINE;//处理终止行
     int tnum = 0;//当前行白条数
     all_connect_num = 0;//白条编号初始化
-    int* map = NULL;
+    uint8* map = NULL;
     for (i = istart; i >= iend; i--)
     {
         map = &IMG[i][LEFT_SIDE];//指针行走加快访问速度
@@ -243,8 +243,8 @@ void find_all_connect()
 ///////////////////////////////////////////
 void find_road()
 {
-    int istart = NEAR_LINE;
-    int iend = FAR_LINE;
+    uint8 istart = NEAR_LINE;
+    uint8 iend = FAR_LINE;
     top_road = NEAR_LINE;//赛道最高处所在行数，先初始化话为最低处
     int road_f = -1;//赛道所在连通域父节点编号，先初始化为-1，以判断是否找到赛道
     int while_range_num = 0, roud_while_range_num = 0;
@@ -299,15 +299,15 @@ void find_road()
 //输出：白条标号
 //备注：认为下一行与本行赛道重叠部分对多的白条为选定赛道
 ///////////////////////////////////////////
-int find_continue(int i_start, int j_start)
+uint8 find_continue(uint8 i_start, uint8 j_start)
 {
-    int j_return;
-    int j;
-    int width_max = 0;
-    int width_new = 0;
-    int left = 0;
-    int right = 0;
-    int dright, dleft, uright, uleft;
+    uint8 j_return;
+    uint8 j;
+    uint8 width_max = 0;
+    uint8 width_new = 0;
+    uint8 left = 0;
+    uint8 right = 0;
+    uint8 dright, dleft, uright, uleft;
     j_return = MISS;//如果没找到，输出255
     if (j_start > my_road[i_start].white_num)
         return MISS;
@@ -352,12 +352,12 @@ int find_continue(int i_start, int j_start)
 ///////////////////////////////////////////
 void ordinary_two_line(void)
 {
-    int i;
-    int j;
-    int j_continue[CAMERA_H];//第一条连通路径
-    int i_start;
-    int i_end;
-    int j_start = MISS;
+    uint8 i;
+    uint8 j;
+    uint8 j_continue[CAMERA_H];//第一条连通路径
+    uint8 i_start;
+    uint8 i_end;
+    uint8 j_start = MISS;
     int width_max;
 
     //寻找起始行最宽的白条子
@@ -417,11 +417,11 @@ void ordinary_two_line(void)
 //输出：
 //备注：因为k66库中认为memset函数不安全，所以无法使用；因此需要自己写一个my_memset
 ///////////////////////////////////////////
-void my_memset(int* ptr, int num, int size)
+void my_memset(uint8* ptr, uint8 num, uint8 size)
 {
-    int* p = ptr;
-    int my_num = num;
-    int Size = size;
+    uint8* p = ptr;
+    uint8 my_num = num;
+    uint8 Size = size;
     for (int i = 0; i < Size; i++, p++)
     {
         *p = my_num;
@@ -556,7 +556,7 @@ float get_error(void)
     return a;
 
 }
-float check_k(int line, int* array, int length, int flag)
+float check_k(int line, uint8* array, int length, int flag)
 {
     float k = 0;
     int sumx = 0;
@@ -586,7 +586,7 @@ float check_k(int line, int* array, int length, int flag)
     return k;
 }
 //两点连线，flag是标志位
-void  connect_line(int x1, int y1, int x2, int y2,int array[120])
+void  connect_line(int x1, int y1, int x2, int y2,uint8 array[120])
 {
     float k, b; int x;
     point line_point;
@@ -794,10 +794,10 @@ void find_light()
 {
     centre_h_pre=centre_h;
     centre_l_pre=centre_l;
-    int istart = NEAR_LINE;
-    int iend = FAR_LINE;
-    int start_light_line = NEAR_LINE;
-    int end_light_line = FAR_LINE;
+    uint8 istart = NEAR_LINE;
+    uint8 iend = FAR_LINE;
+    uint8 start_light_line = NEAR_LINE;
+    uint8 end_light_line = FAR_LINE;
     int while_range_num = 0, light_while_range_num = 0;
     all_range* twhite_range = NULL;
     light* tmy_light = NULL;
