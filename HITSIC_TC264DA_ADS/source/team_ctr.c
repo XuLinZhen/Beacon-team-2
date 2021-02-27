@@ -92,7 +92,7 @@ void Motor_ctr(void)//电机控制闭环
     }
    }
     wifidata[0]=mot_left;wifidata[1]=mot_right;wifidata[2]=M_left_drs;wifidata[3]=M_right_drs;wifidata[4]=M_left_pwm;wifidata[5]=M_right_pwm;
-    //SCHOST_VarUpload(&wifidata[0],12);//WiFi上传数据
+    //SmartCar_VarUpload(&wifidata[0],12);//WiFi上传数据
 }
 
 

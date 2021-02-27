@@ -6179,3 +6179,12 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64 -perspective com.infin
 
 !ENTRY org.eclipse.cdt.codan.core.cxx 4 1 2021-02-27 18:59:36.660
 !MESSAGE Unsupported statement type: CASTCaseStatement.
+
+!ENTRY com.tasking.debug.cdt.core 4 150 2021-02-27 19:30:39.115
+!MESSAGE Error creating session 
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-02-27 19:30:39.115
+!MESSAGE The debug instrument IO could not be initialized.
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-02-27 19:30:39.115
+!MESSAGE The GDI debug instrument provided the following error message.
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-02-27 19:30:39.115
+!MESSAGE Could not open Access HW

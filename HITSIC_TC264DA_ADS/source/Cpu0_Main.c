@@ -52,7 +52,7 @@ int32 Item_ID = 1;
 Car_data CAR[Max_Item_Amount];
 uint8 *buff;
 uint8 Error;
-
+float ssss[2]={0};
 int mode_flag = 0;//状态切换标志位变量
 int *p_mflag = NULL;//状态切换指针
 int prem_flag = 0;//状态切换标志位变量2，previous标志位
@@ -118,11 +118,15 @@ while(1)
         {
         case 0x00:
         {
+
             MenuPrint(MenuRoot, currItem);                  //构建菜单并打印
             //当标志位为0时:
             delay_runcar = 0;  //延迟发车标志位置为0
             while(1)
             {
+                ssss[0]=1;
+                ssss[1]+=2;
+                SmartCar_VarUpload(ssss,2);
                 currItem = ButtonProcess(GetRoot(currItem), currItem);
                 servo_init(&(c_data[0].servo_pwm));//舵机初始化
                 Motorsp_Init();    //电机速度初始化
