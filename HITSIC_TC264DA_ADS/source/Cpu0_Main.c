@@ -48,11 +48,10 @@
 #pragma section all "cpu0_dsram"
 //IfxCpu_syncEvent g_cpuSyncEvent;
 
-
 int32 Item_ID = 1;
 Car_data CAR[Max_Item_Amount];
-
 uint8 *buff;
+uint8 Error;
 
 int mode_flag = 0;//状态切换标志位变量
 int *p_mflag = NULL;//状态切换指针
@@ -92,6 +91,7 @@ int core0_main(void)
     SmartCar_Buffer_Upload((uint8*) DISP_image_100thAnniversary);
     /** 初始化摄像头 */
     // SmartCar_MT9V034_Init();
+    SmartCar_Uart_Init(IfxAsclin0_TX_P14_0_OUT,IfxAsclin0_RXA_P14_1_IN,1152000,0);
     /** 初始化菜单 */
     MenuItem_t* MenuRoot = MenuCreate();
     MenuItem_t *currItem = MenuRoot->Child_list;
@@ -101,12 +101,8 @@ int core0_main(void)
     /** 初始化结束，开启总中断 */
     IfxCpu_enableInterrupts();
     //初始化外设
-
-    //buff = (uint8 *)malloc(4096);
     Date_Read(0);
-    //memcpy(CAR, &buff[0], sizeof(Car_data) * Max_Item_Amount);
     CAR[0].dataint++; //启动次数计数器
-
     c_data[0].M_Kp=CAR[3].datafloat;
     c_data[0].M_Ki=CAR[4].datafloat;
     c_data[0].Motorspeed[0]=CAR[17].datafloat;
@@ -127,23 +123,18 @@ while(1)
             while(1)
             {
                 currItem = ButtonProcess(GetRoot(currItem), currItem);
-                //prem_flag = mode_flag;
                 servo_init(&(c_data[0].servo_pwm));//舵机初始化
                 Motorsp_Init();    //电机速度初始化
-                //if(prem_flag != mode_flag) break;  //如果标志位发生改变则打断循环
+                //如果标志位发生改变则打断循环
                 if(mode_flag != 0x00) break;
             }
         }
         break;
-        case 0x01://百年校庆图标模式
+        case 0x01://模式待定
         {
-          //MENU_Suspend();          //菜单挂起
-          //DISP_SSD1306_BufferUpload((uint8*) DISP_image_100thAnniversary);   //百年校庆图像显示
           while(1)
           {
-              prem_flag = mode_flag;
-              //SDK_DelayAtLeastUs(2000000,180*1000*1000);
-              //if(prem_flag != mode_flag) break;     //如果标志位发生改变则打断循环
+              //如果标志位发生改变则打断循环
               if(mode_flag != 0x01) break;
           }
         }
@@ -151,22 +142,17 @@ while(1)
         case 0x02://摄像头跑车模式
         {
             //pitMgr_t *p;//测试删除定时器中断
-            //MENU_Suspend();               //菜单挂起
             SmartCar_OLED_Fill(0);
-
             SmartCar_MT9V034_Init();
-
-             Motorsp_Init();//电机速度初始化
-             servo_init(&(c_data[0].servo_pwm));//舵机初始化
-             delay_runcar = 0;   //延时发车标志位置0
-             //p = pitMgr_t::insert(5000U, 1U, Delay_car, pitMgr_t::enable);//延时发车，测试删除定时器中断
-             while(1)
+            Motorsp_Init();//电机速度初始化
+            servo_init(&(c_data[0].servo_pwm));//舵机初始化
+            delay_runcar = 0;   //延时发车标志位置0
+            //p = pitMgr_t::insert(5000U, 1U, Delay_car, pitMgr_t::enable);//延时发车，测试删除定时器中断
+            while(1)
                {
                //if(delay_runcar==1) pitMgr_t::remove(*p);//测试不再延迟发车，清除定时器中断
                prem_flag = mode_flag;
-               //run_car(&dmadvpHandle,dispBuffer);
                //摄像头跑车程序内容
-               ///////////////////////////////
                while (!mt9v034_finish_flag){}
                mt9v034_finish_flag = 0;
                THRE();
@@ -174,70 +160,51 @@ while(1)
                servo_pid();
                Speed_radio((c_data[0].servo_pwm-c_data[0].servo_mid));
                SmartCar_Show_IMG((uint8*) mt9v034_image, 120, 188);
-               ///////////////////////////////
-               //if(prem_flag != mode_flag) break;
                if(mode_flag != 0x02) break;
                }
-              //delete imageBuffer0;
-              //delete &dispBuffer;
-              banmaxian_flag = 0;//斑马线识别标志位
+            banmaxian_flag = 0;//斑马线识别标志位
 
         }break;
         case 0x03://电磁跑车模式
-                {
-                    //MENU_Suspend();
-                    //DISP_SSD1306_Fill(0);
-                    //SDK_DelayAtLeastUs(5000000,180*1000*1000);
-                    delay_runcar = 0;//延迟发车标志位
-                while(1)
-                 {
-                    prem_flag = mode_flag;
-                    elec_runcar();
-                    SmartCar_OLED_Printf6x8(30,5,"%c","elecmode");
-                    //if(prem_flag != mode_flag) break;
-                    if(mode_flag != 0x03) break;
-                  }
-                }
-                    break;
-        default: break;//其他模式，待定
-        }
-        //TODO: 在这里添加车模保护代码
+        {
+            delay_runcar = 0;//延迟发车标志位
+        while(1)
+          {
+            prem_flag = mode_flag;
+            elec_runcar();
+            SmartCar_OLED_Printf6x8(30,5,"%c","elecmode");
+            if(mode_flag != 0x03) break;
+          }
+        }break;
+        default:
+         break;//其他模式，待定
+        }//Switch结束
 }//while结束
 
 }//main结束
-
 
 //中断服务函数
 //电机
 IFX_INTERRUPT(cc60_pit_ch0_isr, 0, CCU6_0_CH0_ISR_PRIORITY)
 {
     enableInterrupts();//开启中断嵌套
-
     Motor_ctr();
-
     PIT_CLEAR_FLAG(CCU6_0, PIT_CH0);
-
 }
 
 //舵机
 IFX_INTERRUPT(cc60_pit_ch1_isr, 0, CCU6_0_CH1_ISR_PRIORITY)
 {
     enableInterrupts();//开启中断嵌套
-
     servo();
-
     PIT_CLEAR_FLAG(CCU6_0, PIT_CH1);
-
 }
 //状态切换
 IFX_INTERRUPT(cc61_pit_ch0_isr, 0, CCU6_1_CH0_ISR_PRIORITY)
 {
     enableInterrupts();//开启中断嵌套
-
     mode_switch();
-
     PIT_CLEAR_FLAG(CCU6_1, PIT_CH0);
-
 }
 //待定
 /*IFX_INTERRUPT(cc61_pit_ch1_isr, 0, CCU6_1_CH1_ISR_PRIORITY)
@@ -246,7 +213,6 @@ IFX_INTERRUPT(cc61_pit_ch0_isr, 0, CCU6_1_CH0_ISR_PRIORITY)
     PIT_CLEAR_FLAG(CCU6_1, PIT_CH1);
 
 }*/
-
 void elec_runcar(void)//电磁跑车函数
 {
     servo_pid();
@@ -278,11 +244,6 @@ void mode_switch(void)//模式切换中断回调函数
     //(GPIO_PinRead(GPIOA,13) == 0)? ((*p_mflag) |= 0x04):((*p_mflag) &= 0xfb);
     //(GPIO_PinRead(GPIOA,15) == 0)? ((*p_mflag) |= 0x08):((*p_mflag) &= 0xf7);
 }
-
-
-
-uint8 Error;
-
 MenuItem_t *ItemCreate(char* Item_name, itemType Item_Type, int32 data_min, int32 data_max)
 {
     MenuItem_t* pItem = (MenuItem_t*)malloc(sizeof(MenuItem_t));  //开内存，创建一个新的菜单项结构体 pItem
@@ -299,22 +260,12 @@ MenuItem_t *ItemCreate(char* Item_name, itemType Item_Type, int32 data_min, int3
     pItem->data_range[max] = data_max;
     pItem->Item_data = &CAR[Item_ID-1];
 
-//    if (Item_Type == intType)             //验收后改进：共用体型数据存储
-//    {
-//        pItem->Item_data = &CAR[Item_ID-1].dataint;
-//    }else if (Item_Type == floatType)
-//    {
-//        pItem->Item_data = &CAR[Item_ID-1].dataint;
-//    }
-
     pItem->list_ID = 0;         //主菜单头节点是0
     pItem->Pre_item = NULL;
     pItem->Next_item = NULL;
     pItem->Child_list = NULL;
     return pItem;
 }
-
-
 void MenuItem_Insert(MenuItem_t* Menu, MenuItem_t* pItem)
 {
     if (Menu->Child_list == NULL)  //当当前menu的子菜单为空时，创立新的子菜单
@@ -337,8 +288,6 @@ void MenuItem_Insert(MenuItem_t* Menu, MenuItem_t* pItem)
         Menu->Item_data->dataint++;
     }
 }
-
-
 MenuItem_t *MenuCreate(void)
 {
 
@@ -379,7 +328,6 @@ MenuItem_t *MenuCreate(void)
         MenuItem_t* Threshold = ItemCreate("Threshold", intType, 0, 255);
         Threshold->Item_data->dataint=threshold;
 
-
         MenuItem_Insert(Camera, ItemCreate("Back", listType, 1, 20));
         MenuItem_Insert(Camera, Threshold);
     }
@@ -395,32 +343,8 @@ MenuItem_t *MenuCreate(void)
     MenuItem_Insert(MenuRoot, Camera);
     MenuItem_Insert(MenuRoot, Motor_Speed);
     MenuItem_Insert(MenuRoot, SAVE);
-
-
-/*
-    MenuItem_t* PID = ItemCreate("PID", listType, 1, 20);
-    MenuItem_Insert(MenuRoot, PID);
-    MenuItem_Insert(PID, ItemCreate("Back", listType, 1, 20));
-    MenuItem_t* PID1 = ItemCreate("PID1", listType, 1, 20);
-    MenuItem_t* PID2 = ItemCreate("PID2", listType, 1, 20);
-    MenuItem_Insert(PID, PID1);
-    MenuItem_Insert(PID, PID2);
-    MenuItem_Insert(PID, ItemCreate("Gear", intType, 1, 2));   //特殊项，PID档位设置，因暂无PID程序，故未体现特殊性  ID = 12
-
-    MenuItem_Insert(PID1, ItemCreate("Back", listType, 1, 20));
-    MenuItem_Insert(PID1, ItemCreate("Kp1", floatType, 0, 10));     //特殊项  ID = 14，特殊项的ID有枚举
-    MenuItem_Insert(PID1, ItemCreate("Ti1", intType, 0, 2000));     //特殊项  ID = 15
-    MenuItem_Insert(PID1, ItemCreate("Td1", intType, 0, 2000));     //特殊项  ID = 16
-
-    MenuItem_Insert(PID2, ItemCreate("Back", listType, 1, 20));
-    MenuItem_Insert(PID2, ItemCreate("Kp2", floatType, 1, 20));
-    MenuItem_Insert(PID2, ItemCreate("Ti2", intType, 0, 2000));
-    MenuItem_Insert(PID2, ItemCreate("Td2", intType, 0, 2000));
-    MenuItem_Insert(MenuRoot, ItemCreate("SAVE", listType, 0, 20)); //特殊项  ID = 21*/
     return MenuRoot;
 }
-
-
 /**
  * @ 显示效果:
  * @
@@ -481,8 +405,6 @@ void MenuPrint(MenuItem_t *Menu, MenuItem_t *currItem)  //再加一项当前指针
         SmartCar_OLED_Printf6x8(0, currItem->list_ID + 1,">");
     }
 }
-
-
 int ButtonRead(void)
 {
     int button_operation = 0;
@@ -513,14 +435,6 @@ int ButtonRead(void)
     }
     return button_operation;
 }
-
-
-void delay(uint32 i)
-{
-    while(i--);
-}
-
-
 MenuItem_t *ButtonProcess(MenuItem_t *Menu, MenuItem_t* currItem)
 {
     int button_order = ButtonRead();
@@ -572,8 +486,6 @@ MenuItem_t *ButtonProcess(MenuItem_t *Menu, MenuItem_t* currItem)
     }
     return currItem;
 }
-
-
 MenuItem_t *CursorMove_down(MenuItem_t* currItem)
 {
     if (currItem->Next_item != NULL)
@@ -582,8 +494,6 @@ MenuItem_t *CursorMove_down(MenuItem_t* currItem)
     }
     return currItem;
 }
-
-
 MenuItem_t *CursorMove_up(MenuItem_t* currItem)
 {
     if (currItem->list_ID > 1)
@@ -592,8 +502,6 @@ MenuItem_t *CursorMove_up(MenuItem_t* currItem)
     }
     return currItem;
 }
-
-
 MenuItem_t *IntoMenu(MenuItem_t *currItem)
 {
     if (currItem->list_ID == 1)     //[Back]
@@ -608,8 +516,6 @@ MenuItem_t *IntoMenu(MenuItem_t *currItem)
     }
     return currItem;
 }
-
-
 MenuItem_t *GetRoot(MenuItem_t *currItem)       //获取当前操作的菜单项所属的菜单
 {
     MenuItem_t *pctrl = currItem;
@@ -621,8 +527,6 @@ MenuItem_t *GetRoot(MenuItem_t *currItem)       //获取当前操作的菜单项所属的菜单
     }
     return pctrl->Pre_item;
 }
-
-
 /**
  * @ 显示效果:
  * @
@@ -718,8 +622,6 @@ void ItemPrint(MenuItem_t *currItem, int32 pos, int32 *data_array, int32 length)
             break;
     }*/
 }
-
-
 MenuItem_t *DataModify(MenuItem_t *currItem)
 {
     int max_digit, i;
@@ -816,8 +718,6 @@ MenuItem_t *DataModify(MenuItem_t *currItem)
     }
     return currItem;
 }
-
-
 int32 DataCheck(MenuItem_t *currItem, int32 Item_dataint)
 {
     if (currItem->Item_type == intType)
@@ -831,7 +731,6 @@ int32 DataCheck(MenuItem_t *currItem, int32 Item_dataint)
         //return ( (currItem->data_range[max] - Item_datafloat) > 1e-6 && (Item_datafloat - currItem->data_range[min]) > 1e-6 );
     }
 }
-
 int32 ArrayToDataint(int32 *data_array, int32 length)
 {
     int Item_dataint = 0;
@@ -843,7 +742,6 @@ int32 ArrayToDataint(int32 *data_array, int32 length)
     }
     return Item_dataint;
 }
-
 void Date_Read(uint32 sector_num)
 {
     CAR[3].datafloat=Page_Read(sector_num,0,float);

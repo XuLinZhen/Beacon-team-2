@@ -97,11 +97,6 @@ void MenuItem_Insert(MenuItem_t* Menu, MenuItem_t* pItem);
 void MenuPrint(MenuItem_t *Menu, MenuItem_t *currItem);
 
 /**
- * @brief : 延时函数
- */
-void delay(uint32 i);
-
-/**
  * @brief : 根据需要打印菜单项currItem，修改参数时用
  * @pos:光标位置；
  * @data_array:菜单项数据按位拆分成数组
