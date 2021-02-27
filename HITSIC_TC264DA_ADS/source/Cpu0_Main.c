@@ -102,8 +102,8 @@ int core0_main(void)
     IfxCpu_enableInterrupts();
     //初始化外设
 
-    buff = (uint8 *)malloc(4096);
-    //Date_Read(0,8,buff);
+    //buff = (uint8 *)malloc(4096);
+    Date_Read(0,8,buff);
     //memcpy(CAR, &buff[0], sizeof(Car_data) * Max_Item_Amount);
     CAR[0].dataint++; //启动次数计数器
 
@@ -546,7 +546,7 @@ MenuItem_t *ButtonProcess(MenuItem_t *Menu, MenuItem_t* currItem)
                 da[5]=c_data[0].Kd;
                 da[6]=c_data[0].servo_mid;
                 da[7]=threshold;*/
-                memcpy(&buff[0], CAR, sizeof(Car_data) * Max_Item_Amount);
+                //memcpy(&buff[0], CAR, sizeof(Car_data) * Max_Item_Amount);
                 Date_Write(0,8,buff);
                 MenuPrint(Menu, currItem);
                 c_data[0].M_Kp=CAR[3].datafloat;
@@ -846,18 +846,38 @@ int32 ArrayToDataint(int32 *data_array, int32 length)
 
 void Date_Read(uint32 sector_num,uint32 page_num,uint8 buff[])
 {
-    for(int i=0;i<page_num;i++)
+    /*for(int i=0;i<page_num;i++)
     {
-        buff[i]=Page_Read(sector_num,i,uint8);
-    }
+        buff[i]=Page_Read(sector_num,i,float);
+    }*/
+    CAR[3].datafloat=Page_Read(sector_num,0,float);
+    CAR[4].datafloat=Page_Read(sector_num,1,float);
+    CAR[17].datafloat=Page_Read(sector_num,2,float);
+    CAR[5].datafloat=Page_Read(sector_num,3,float);
+    CAR[8].datafloat=Page_Read(sector_num,4,float);
+    CAR[3].datafloat=Page_Read(sector_num,5,float);
+    CAR[9].datafloat=Page_Read(sector_num,6,float);
+    CAR[10].datafloat=Page_Read(sector_num,7,float);
+    CAR[13].datafloat=Page_Read(sector_num,8,int);
 }
 void Date_Write(uint32 sector_num,uint32 page_num,uint8 buff[])
 {
     Sector_Erase(sector_num);
+    uint32 fla[8];
+     fla[0]=float_conversion_uint32(CAR[3].datafloat);
+     fla[1]=float_conversion_uint32(CAR[4].datafloat);
+     fla[2]=float_conversion_uint32(CAR[17].datafloat);
+     fla[3]=float_conversion_uint32(CAR[5].datafloat);
+     fla[4]=float_conversion_uint32(CAR[8].datafloat);
+     fla[5]=float_conversion_uint32(CAR[9].datafloat);
+     fla[6]=float_conversion_uint32(CAR[10].datafloat);
+     fla[7]=float_conversion_uint32(CAR[13].dataint);
+
+     Sector_Program(sector_num,fla);
     for(int i=0;i<page_num;i++)
         {
-            //Sector_Program(sector_num,buff);
-            Page_Program(sector_num,i, buff[i]);
+            //Page_Program(sector_num,i, buff[i]);
+            uint32 abc=Page_Read(sector_num,i,uint32);
         }
 }
 
