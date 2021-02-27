@@ -91,6 +91,7 @@ int core0_main(void)
     SmartCar_Buffer_Upload((uint8*) DISP_image_100thAnniversary);
     /** 初始化摄像头 */
     // SmartCar_MT9V034_Init();
+    /** 初始化串口 */
     SmartCar_Uart_Init(IfxAsclin0_TX_P14_0_OUT,IfxAsclin0_RXA_P14_1_IN,1152000,0);
     /** 初始化菜单 */
     MenuItem_t* MenuRoot = MenuCreate();
@@ -160,6 +161,9 @@ while(1)
                servo_pid();
                Speed_radio((c_data[0].servo_pwm-c_data[0].servo_mid));
                SmartCar_Show_IMG((uint8*) mt9v034_image, 120, 188);
+               /* 传图 */
+               //SmartCar_ImgUpload((uint8*) mt9v034_image, 120, 188);
+               /********/
                if(mode_flag != 0x02) break;
                }
             banmaxian_flag = 0;//斑马线识别标志位
