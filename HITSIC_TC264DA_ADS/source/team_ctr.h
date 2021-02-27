@@ -25,7 +25,7 @@ extern float M_left_drs;    //左电机理想速度
 extern float M_right_pwm;
 extern float wifidata[20];
 extern float da[8];
-extern int Error;
+
 typedef struct _cardata{
     int32 Motorspeed[3] ;//= {22,0,150};
     float servo_mid;//=7.51;            //定义舵机中值
@@ -36,17 +36,6 @@ typedef struct _cardata{
     float M_Ki; //= 0.4;              //定义电机积分系数
     float Sradio;// = 2.0;
 }cardata;
-/*typedef struct _cardata{
-    //int32 Motorspeed[3] = {22,0,150};
-    float servo_mid;            //定义舵机中值
-    float servo_pwm=7.51;            //定义舵机pwm值
-    float Kp = 0.0091;                //定义舵机比例系数
-    float Kd = 0.0065;                //定义舵机微分系数
-    float M_Kp = 1.0;              //定义电机比例系数
-    float M_Ki = 0.4;              //定义电机积分系数
-    float Sradio = 2.0;
-}carddddata;
-**/
 extern cardata c_data[2];//车数据数组
 /**********************************************************************************************************************
 *  @brief      电机控制函数在定时器中断中运行

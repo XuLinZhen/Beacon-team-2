@@ -5,12 +5,13 @@
  *      Author: Administrator
  */
 
+#include "SmartCar_Systick.h"
 #include "SmartCar_GPIO.h"
-#include"menu.h"
-#include"team_ctr.h"
-#include"image.h"
+#include "menu.h"
+#include "team_ctr.h"
+#include "image.h"
 
-//uint8 Error;
+uint8 Error;
 
 MenuItem_t *ItemCreate(char* Item_name, itemType Item_Type, int32 data_min, int32 data_max)
 {
@@ -164,15 +165,31 @@ void MenuPrint(MenuItem_t *Menu, MenuItem_t *currItem)  //再加一项当前指针
 {
     SmartCar_OLED_Fill(0);
     int x = 0, y = 2;   //菜单项在y = 2开始
+    SmartCar_OLED_Printf6x8(0,4,"%f",CAR[3].datafloat);
     SmartCar_OLED_Printf6x8(0, 1,"---------------------");
-    SmartCar_OLED_Printf6x8(0, 0,"%s", Menu->Item_name);
-    SmartCar_OLED_Printf6x8(0, 0,"       %d", currItem->list_ID);
-    SmartCar_OLED_Printf6x8(0, 0,"         /%d", Menu->Item_data->dataint);
+    SmartCar_OLED_P6x8Str(0, 0, Menu->Item_name);//"%s",
+    SmartCar_OLED_Printf6x8(100, 0, "%d",currItem->list_ID);//"%d" ,
+    SmartCar_OLED_P6x8Str(110, 0, "/");
+    //if(currItem->Item_type==floatType) SmartCar_OLED_Printf6x8(120, 0, "%d" , CAR[currItem->ID-1].datafloat);
+    //else if(currItem->Item_type==intType) SmartCar_OLED_Printf6x8(120, 0, "%d" , CAR[currItem->ID-1].dataint);
+    SmartCar_OLED_Printf6x8(120, 0, "%d" , Menu->Item_data->dataint);
+    /*if(currItem->Item_name=="M_Speed")
+    {
+        SmartCar_OLED_Printf6x8(120, 0, "%d" , Menu->Item_data->dataint);
+    }*/
     //SmartCar_OLED_Printf6x8(0, 0,"%s     %d/%d", Menu->Item_name,currItem->list_ID, Menu->Item_data->dataint);
 
     int start_print_ID;
     MenuItem_t *pctrl = Menu->Child_list;
-    start_print_ID = currItem->list_ID <= 6? 1:currItem->list_ID - 5;   //滚动式菜单，
+    if(currItem->list_ID <= 6)
+    {
+        start_print_ID=1;
+    }
+    else
+    {
+        start_print_ID=currItem->list_ID - 5;
+    }
+    //start_print_ID = currItem->list_ID <= 6? 1:currItem->list_ID - 5;   //滚动式菜单，
     while (pctrl->list_ID != start_print_ID)        //从哪一项开始打印，需要改，光标移到最后再往上移有问题。
     {
         pctrl = pctrl->Next_item;
@@ -180,47 +197,59 @@ void MenuPrint(MenuItem_t *Menu, MenuItem_t *currItem)  //再加一项当前指针
     while (pctrl != NULL && y <= 7)
     {
         if (pctrl->Item_type == listType)
-            SmartCar_OLED_Printf6x8(6, y,"[%s]", pctrl->Item_name);
+            SmartCar_OLED_P6x8Str(6, y, pctrl->Item_name);
         else if (pctrl->Item_type == intType)
         {
-            SmartCar_OLED_Printf6x8(6, y,"%s", pctrl->Item_name);
-            SmartCar_OLED_Printf6x8(66, y,"%3d", pctrl->Item_data->dataint);
+            SmartCar_OLED_P6x8Str(6, y, pctrl->Item_name);
+            SmartCar_OLED_Printf6x8(66, y,"%d", pctrl->Item_data->dataint);
         }
         else if (pctrl->Item_type == floatType)
         {
-            SmartCar_OLED_Printf6x8(6, y,"%s", pctrl->Item_name);
+            SmartCar_OLED_P6x8Str(6, y, pctrl->Item_name);
             SmartCar_OLED_Printf6x8(66, y,"%3.4f", pctrl->Item_data->datafloat);
         }
         y++;
         pctrl = pctrl->Next_item;
     }
-    SmartCar_OLED_Printf6x8(0, currItem->list_ID + 1 >= 7? 7: currItem->list_ID + 1,">");
+    if(currItem->list_ID + 1 >= 7)
+    {
+        SmartCar_OLED_Printf6x8(0, 7,">");
+    }
+    else
+    {
+        SmartCar_OLED_Printf6x8(0, currItem->list_ID + 1,">");
+    }
+    //SmartCar_OLED_Printf6x8(0, currItem->list_ID + 1 >= 7? 7: currItem->list_ID + 1,">");
 }
 
 
 int ButtonRead(void)
 {
     int button_operation = 0;
-    delay(2*1800000);
     if (!GPIO_Read(P22,0))
     {
         button_operation = up;
+        Delay_ms(STM0, 500);
     }
     if (!GPIO_Read(P22,1))
     {
         button_operation = down;
+        Delay_ms(STM0, 500);
     }
-    if (!GPIO_Read(P22,2))
+    if (!GPIO_Read(P22,2) && GPIO_Read(P22,3))
     {
         button_operation = left;
+        Delay_ms(STM0, 500);
     }
-    if (!GPIO_Read(P22,3))
+    if (!GPIO_Read(P22,3) && GPIO_Read(P22,2))
     {
         button_operation = right;
+        Delay_ms(STM0, 500);
     }
     if (!GPIO_Read(P22,3) && !GPIO_Read(P22,2))
     {
         button_operation = OK;
+        Delay_ms(STM0, 500);
     }
     return button_operation;
 }
@@ -352,13 +381,20 @@ void ItemPrint(MenuItem_t *currItem, int32 pos, int32 *data_array, int32 length)
     SmartCar_OLED_Fill(0);
     int max_digit = length;//sizeof(data_array) / sizeof(int32_t);
 
-    SmartCar_OLED_Printf6x8(0, 0,"  %s   [%d,%d]", currItem->Item_name, currItem->data_range[min], currItem->data_range[max]);
+    SmartCar_OLED_P6x8Str(10, 0, currItem->Item_name);//"%s",
+    SmartCar_OLED_Printf6x8(80, 0, "[");
+    SmartCar_OLED_Printf6x8(90, 0, "%d" ,currItem->data_range[min]);
+    SmartCar_OLED_Printf6x8(100, 0, ",");
+    SmartCar_OLED_Printf6x8(110, 0, "%d" , currItem->data_range[max]);
+    SmartCar_OLED_Printf6x8(120, 0, "]");
+    //SmartCar_OLED_Printf6x8(0, 0,"  %s   [%d,%d]", currItem->Item_name, currItem->data_range[min], currItem->data_range[max]);
+
     SmartCar_OLED_Printf6x8(0, 1,"---------------------");
 
     int i;
     for(i = 0; i < max_digit; i++)
     {
-        //DISP_SSD1306_Printf_F6x8(42 + i*6, 3, "%d", data_array[i]);     //显示各个数位
+        //显示各个数位
         if (currItem->Item_type == floatType)
         {
             if(i==(max_digit-4))
@@ -427,7 +463,15 @@ void ItemPrint(MenuItem_t *currItem, int32 pos, int32 *data_array, int32 length)
 MenuItem_t *DataModify(MenuItem_t *currItem)
 {
     int max_digit, i;
-    max_digit = (currItem->Item_type == intType) ? 0 : 4;   //所有浮点型均为四位小数
+    if(currItem->Item_type == intType)
+    {
+        max_digit=0;
+    }
+    else
+    {
+        max_digit=4;
+    }
+    //max_digit = (currItem->Item_type == intType) ? 0 : 4;   //所有浮点型均为四位小数
     int data_max = currItem->data_range[max];
     while(data_max != 0)
     {
@@ -436,7 +480,16 @@ MenuItem_t *DataModify(MenuItem_t *currItem)
     }                       //获得最大数位
 
     int data_array[max_digit];
-    int Item_dataint = (currItem->Item_type == intType) ? currItem->Item_data->dataint : floor(currItem->Item_data->datafloat * 10000);
+    int Item_dataint=0;
+    if(currItem->Item_type == intType)
+    {
+        Item_dataint = currItem->Item_data->dataint;
+    }
+    else
+    {
+        Item_dataint = floor(currItem->Item_data->datafloat * 10000);
+    }
+    //int Item_dataint = (currItem->Item_type == intType) ? currItem->Item_data->dataint : floor(currItem->Item_data->datafloat * 10000);
     for(i = 0; i < max_digit; i++)
     {
         data_array[max_digit - 1 - i] = Item_dataint % 10;//((i+1)*10);

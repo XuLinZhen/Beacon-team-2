@@ -113,11 +113,12 @@ int core0_main(void)
     IfxCpu_enableInterrupts();
     //初始化外设
 
-    //buff = (uint8 *)malloc(4096);
+    buff = (uint8 *)malloc(4096);
     //Date_Read(0,8,buff);
     //memcpy(CAR, &buff[0], sizeof(Car_data) * Max_Item_Amount);
-    //CAR[0].dataint++; //启动次数计数器
+    CAR[0].dataint++; //启动次数计数器
 
+    //SmartCar_OLED_Printf6x8(0,4,"%3.2f",CAR[3].datafloat);
     c_data[0].M_Kp=CAR[3].datafloat;
     c_data[0].M_Ki=CAR[4].datafloat;
     c_data[0].Motorspeed[0]=CAR[17].datafloat;
@@ -126,8 +127,7 @@ int core0_main(void)
     c_data[0].Kd=CAR[9].datafloat;
     c_data[0].servo_mid=CAR[10].datafloat;
     threshold=CAR[13].dataint;
-
-while(TRUE)
+while(1)
 {
     switch(mode_flag)//菜单模式
         {
@@ -136,7 +136,7 @@ while(TRUE)
             MenuPrint(MenuRoot, currItem);                  //构建菜单并打印
             //当标志位为0时:
             delay_runcar = 0;  //延迟发车标志位置为0
-            while(TRUE)
+            while(1)
             {
                 currItem = ButtonProcess(GetRoot(currItem), currItem);
                 //prem_flag = mode_flag;
@@ -151,7 +151,7 @@ while(TRUE)
         {
           //MENU_Suspend();          //菜单挂起
           //DISP_SSD1306_BufferUpload((uint8*) DISP_image_100thAnniversary);   //百年校庆图像显示
-          while(TRUE)
+          while(1)
           {
               prem_flag = mode_flag;
               //SDK_DelayAtLeastUs(2000000,180*1000*1000);
@@ -172,7 +172,7 @@ while(TRUE)
              servo_init(&(c_data[0].servo_pwm));//舵机初始化
              delay_runcar = 0;   //延时发车标志位置0
              //p = pitMgr_t::insert(5000U, 1U, Delay_car, pitMgr_t::enable);//延时发车，测试删除定时器中断
-             while(TRUE)
+             while(1)
                {
                //if(delay_runcar==1) pitMgr_t::remove(*p);//测试不再延迟发车，清除定时器中断
                prem_flag = mode_flag;
@@ -201,7 +201,7 @@ while(TRUE)
                     //DISP_SSD1306_Fill(0);
                     //SDK_DelayAtLeastUs(5000000,180*1000*1000);
                     delay_runcar = 0;//延迟发车标志位
-                while(TRUE)
+                while(1)
                  {
                     prem_flag = mode_flag;
                     elec_runcar();
@@ -290,8 +290,28 @@ void elec_runcar(void)//电磁跑车函数
 }
 void mode_switch(void)//模式切换中断回调函数
 {
-    (GPIO_Read(P33, 12) == 0)? ((*p_mflag) |= 0x01):((*p_mflag) &= 0xfe);
-    (GPIO_Read(P33, 13) == 0)? ((*p_mflag) |= 0x02):((*p_mflag) &= 0xfd);
+    if(GPIO_Read(P33, 12) == 1 && GPIO_Read(P33, 13) == 1)
+    {
+        //(*p_mflag) |= 0x01;
+        mode_flag=0;
+    }
+    else if(GPIO_Read(P33, 12) != 1 && GPIO_Read(P33, 13) == 1)
+    {
+        //(*p_mflag) &= 0xfe;
+        mode_flag=1;
+    }
+    else if(GPIO_Read(P33, 12) == 1 && GPIO_Read(P33, 13) != 1)
+    {
+        //(*p_mflag) |= 0x02;
+        mode_flag=2;
+    }
+    else if(GPIO_Read(P33, 12) != 1 && GPIO_Read(P33, 13) != 1)
+    {
+        //(*p_mflag) &= 0xfd;
+        mode_flag=3;
+    }
+    //(GPIO_Read(P33, 12) == 0)? ((*p_mflag) |= 0x01):((*p_mflag) &= 0xfe);
+    //(GPIO_Read(P33, 13) == 0)? ((*p_mflag) |= 0x02):((*p_mflag) &= 0xfd);
     //(GPIO_PinRead(GPIOA,13) == 0)? ((*p_mflag) |= 0x04):((*p_mflag) &= 0xfb);
     //(GPIO_PinRead(GPIOA,15) == 0)? ((*p_mflag) |= 0x08):((*p_mflag) &= 0xf7);
 }

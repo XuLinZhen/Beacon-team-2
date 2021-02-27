@@ -21,8 +21,7 @@
 
 extern int32 Item_ID;
 extern uint8 *buff;
-//extern uint8 Error;
-
+extern uint8 Error;
 typedef enum item_type          //菜单项类型
 {
     intType = 1,                //整数型
@@ -77,9 +76,9 @@ extern Car_data CAR[Max_Item_Amount];  //数据结构体，包含整形和浮点型
 typedef struct MenuItem_t
 {
     itemType    Item_type;              //菜单项类型
-    uint32         list_ID;                //菜单项在其直属菜单中的序号
-    uint32         ID;                     //菜单项总序号
-    uint32         data_range[2];          //数据上下限
+    int         list_ID;                //菜单项在其直属菜单中的序号
+    int         ID;                     //菜单项总序号
+    int         data_range[2];          //数据上下限
     Car_data   *Item_data;              //数据指针，指向结构体
     struct MenuItem_t *Pre_item;               //前一个节点指针
     struct MenuItem_t *Next_item;              //后一个节点指针
