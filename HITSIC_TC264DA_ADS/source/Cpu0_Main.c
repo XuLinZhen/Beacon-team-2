@@ -102,7 +102,7 @@ int core0_main(void)
     extern const uint8 DISP_image_100thAnniversary[8][128];
     SmartCar_Buffer_Upload((uint8*) DISP_image_100thAnniversary);
     /** 初始化摄像头 */
-    SmartCar_MT9V034_Init();
+    // SmartCar_MT9V034_Init();
     /** 初始化菜单 */
     MenuItem_t* MenuRoot = MenuCreate();
     MenuItem_t *currItem = MenuRoot->Child_list;

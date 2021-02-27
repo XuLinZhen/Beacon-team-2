@@ -165,7 +165,10 @@ void MenuPrint(MenuItem_t *Menu, MenuItem_t *currItem)  //再加一项当前指针
     SmartCar_OLED_Fill(0);
     int x = 0, y = 2;   //菜单项在y = 2开始
     SmartCar_OLED_Printf6x8(0, 1,"---------------------");
-    SmartCar_OLED_Printf6x8(0, 0,"%s     %d/%d", Menu->Item_name,currItem->list_ID, Menu->Item_data->dataint);
+    SmartCar_OLED_Printf6x8(0, 0,"%s", Menu->Item_name);
+    SmartCar_OLED_Printf6x8(0, 0,"       %d", currItem->list_ID);
+    SmartCar_OLED_Printf6x8(0, 0,"         /%d", Menu->Item_data->dataint);
+    //SmartCar_OLED_Printf6x8(0, 0,"%s     %d/%d", Menu->Item_name,currItem->list_ID, Menu->Item_data->dataint);
 
     int start_print_ID;
     MenuItem_t *pctrl = Menu->Child_list;
