@@ -103,7 +103,7 @@ int core0_main(void)
     //初始化外设
 
     //buff = (uint8 *)malloc(4096);
-    Date_Read(0,8,buff);
+    Date_Read(0);
     //memcpy(CAR, &buff[0], sizeof(Car_data) * Max_Item_Amount);
     CAR[0].dataint++; //启动次数计数器
 
@@ -547,7 +547,7 @@ MenuItem_t *ButtonProcess(MenuItem_t *Menu, MenuItem_t* currItem)
                 da[6]=c_data[0].servo_mid;
                 da[7]=threshold;*/
                 //memcpy(&buff[0], CAR, sizeof(Car_data) * Max_Item_Amount);
-                Date_Write(0,8,buff);
+                Date_Write(0);
                 MenuPrint(Menu, currItem);
                 c_data[0].M_Kp=CAR[3].datafloat;
                 c_data[0].M_Ki=CAR[4].datafloat;
@@ -642,10 +642,10 @@ void ItemPrint(MenuItem_t *currItem, int32 pos, int32 *data_array, int32 length)
     int max_digit = length;//sizeof(data_array) / sizeof(int32_t);
 
     SmartCar_OLED_P6x8Str(10, 0, currItem->Item_name);//"%s",
-    SmartCar_OLED_Printf6x8(80, 0, "[");
-    SmartCar_OLED_Printf6x8(90, 0, "%d" ,currItem->data_range[min]);
-    SmartCar_OLED_Printf6x8(100, 0, ",");
-    SmartCar_OLED_Printf6x8(110, 0, "%d" , currItem->data_range[max]);
+    SmartCar_OLED_Printf6x8(70, 0, "[");
+    SmartCar_OLED_Printf6x8(80, 0, "%d" ,currItem->data_range[min]);
+    SmartCar_OLED_Printf6x8(90, 0, ",");
+    SmartCar_OLED_Printf6x8(100, 0, "%d" , currItem->data_range[max]);
     SmartCar_OLED_Printf6x8(120, 0, "]");
     //SmartCar_OLED_Printf6x8(0, 0,"  %s   [%d,%d]", currItem->Item_name, currItem->data_range[min], currItem->data_range[max]);
 
@@ -680,15 +680,15 @@ void ItemPrint(MenuItem_t *currItem, int32 pos, int32 *data_array, int32 length)
             SmartCar_OLED_Printf6x8(42 + i*6, 3, "%d", data_array[i]);     //显示各个数位
         }
     }
-    SmartCar_OLED_Printf6x8(12, 7, "[OK]");
-    SmartCar_OLED_Printf6x8(60, 7, "[Cancel]");
+    SmartCar_OLED_Printf6x8(80, 7, "[OK]");
+    SmartCar_OLED_Printf6x8(12, 7, "[Cancel]");
     if  (pos == max_digit + 1)
     {
         SmartCar_OLED_Printf6x8(6, 7, ">");
     }
     else if (pos == max_digit + 2)
     {
-        SmartCar_OLED_Printf6x8(54, 7, ">");
+        SmartCar_OLED_Printf6x8(74, 7, ">");
     }
     else
     {
@@ -792,7 +792,7 @@ MenuItem_t *DataModify(MenuItem_t *currItem)
                 }
                 break;
             case OK:
-                if (pos == max_digit + 1)       //[OK]
+                if (pos == max_digit + 2)       //[OK]
                 {
                     Item_dataint = ArrayToDataint(data_array, max_digit);
                     if (DataCheck(currItem, Item_dataint))
@@ -804,7 +804,7 @@ MenuItem_t *DataModify(MenuItem_t *currItem)
                     flag_return = 1;
                     break;
                 }
-                if (pos == max_digit + 2)           //[cancel]，返回上一级菜单
+                if (pos == max_digit + 1)           //[cancel]，返回上一级菜单
                 {
                     flag_return = 1;
                 }
@@ -844,12 +844,8 @@ int32 ArrayToDataint(int32 *data_array, int32 length)
     return Item_dataint;
 }
 
-void Date_Read(uint32 sector_num,uint32 page_num,uint8 buff[])
+void Date_Read(uint32 sector_num)
 {
-    /*for(int i=0;i<page_num;i++)
-    {
-        buff[i]=Page_Read(sector_num,i,float);
-    }*/
     CAR[3].datafloat=Page_Read(sector_num,0,float);
     CAR[4].datafloat=Page_Read(sector_num,1,float);
     CAR[17].datafloat=Page_Read(sector_num,2,float);
@@ -860,25 +856,19 @@ void Date_Read(uint32 sector_num,uint32 page_num,uint8 buff[])
     CAR[10].datafloat=Page_Read(sector_num,7,float);
     CAR[13].datafloat=Page_Read(sector_num,8,int);
 }
-void Date_Write(uint32 sector_num,uint32 page_num,uint8 buff[])
+void Date_Write(uint32 sector_num)
 {
     Sector_Erase(sector_num);
     uint32 fla[8];
-     fla[0]=float_conversion_uint32(CAR[3].datafloat);
-     fla[1]=float_conversion_uint32(CAR[4].datafloat);
-     fla[2]=float_conversion_uint32(CAR[17].datafloat);
-     fla[3]=float_conversion_uint32(CAR[5].datafloat);
-     fla[4]=float_conversion_uint32(CAR[8].datafloat);
-     fla[5]=float_conversion_uint32(CAR[9].datafloat);
-     fla[6]=float_conversion_uint32(CAR[10].datafloat);
-     fla[7]=float_conversion_uint32(CAR[13].dataint);
-
-     Sector_Program(sector_num,fla);
-    for(int i=0;i<page_num;i++)
-        {
-            //Page_Program(sector_num,i, buff[i]);
-            uint32 abc=Page_Read(sector_num,i,uint32);
-        }
+    fla[0]=float_conversion_uint32(CAR[3].datafloat);
+    fla[1]=float_conversion_uint32(CAR[4].datafloat);
+    fla[2]=float_conversion_uint32(CAR[17].datafloat);
+    fla[3]=float_conversion_uint32(CAR[5].datafloat);
+    fla[4]=float_conversion_uint32(CAR[8].datafloat);
+    fla[5]=float_conversion_uint32(CAR[9].datafloat);
+    fla[6]=float_conversion_uint32(CAR[10].datafloat);
+    fla[7]=float_conversion_uint32(CAR[13].dataint);
+    Sector_Program(sector_num,fla);
 }
 
 

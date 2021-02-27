@@ -165,18 +165,14 @@ MenuItem_t *DataModify(MenuItem_t *currItem);
 /**
  * @brief : 数据读取函数
  * @sector_num:从哪一个扇区读取数据
- * @page_num:读取到该扇区多少页
- * @buff: 数据存储数组
  */
-void Date_Read(uint32 sector_num,uint32 page_num,uint8 buff[]);
+void Date_Read(uint32 sector_num);
 
 /**
  * @brief : 数据写入函数
  * @sector_num:从哪一个扇区读取数据
- * @page_num:读取到该扇区多少页
- * @buff: 数据存储数组
  */
-void Date_Write(uint32 sector_num,uint32 page_num,uint8 buff[]);
+void Date_Write(uint32 sector_num);
 
 
 
