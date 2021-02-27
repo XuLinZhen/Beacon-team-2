@@ -36,6 +36,7 @@
 #include "SmartCar_MPU.h"
 #include "SmartCar_MT9V034.h"
 #include "SmartCar_Systick.h"
+#include "SmartCar_PIT.h"
 #include "common.h"
 
 #include "team_ctr.h"
@@ -54,7 +55,7 @@
 int32 Item_ID = 1;
 Car_data CAR[Max_Item_Amount];
 
-//int *buff;
+uint8 *buff;
 
 //cam_zf9v034_configPacket_t cameraCfg;
 //dmadvp_config_t dmadvpCfg;
@@ -96,10 +97,12 @@ int core0_main(void)
     Pit_Init(CCU6_0,PIT_CH1,3000*1000);  //舵机
     Pit_Init(CCU6_1,PIT_CH0,7000*1000);  //状态切换
     //Pit_Init(CCU6_1,PIT_CH1,1000*1000);  //待定
-    /** 初始化OLED屏幕 */
+    /** 初始化OLED屏幕  */
     SmartCar_Oled_Init();
     extern const uint8 DISP_image_100thAnniversary[8][128];
     SmartCar_Buffer_Upload((uint8*) DISP_image_100thAnniversary);
+    /** 初始化摄像头 */
+    SmartCar_MT9V034_Init();
     /** 初始化菜单 */
     MenuItem_t* MenuRoot = MenuCreate();
     MenuItem_t *currItem = MenuRoot->Child_list;
@@ -110,10 +113,10 @@ int core0_main(void)
     IfxCpu_enableInterrupts();
     //初始化外设
 
-    buff = (uint8 *)malloc(4096);
-    Date_Read(0,8,buff);
-    memcpy(CAR, &buff[0], sizeof(Car_data) * Max_Item_Amount);
-    CAR[0].dataint++; //启动次数计数器
+    //buff = (uint8 *)malloc(4096);
+    //Date_Read(0,8,buff);
+    //memcpy(CAR, &buff[0], sizeof(Car_data) * Max_Item_Amount);
+    //CAR[0].dataint++; //启动次数计数器
 
     c_data[0].M_Kp=CAR[3].datafloat;
     c_data[0].M_Ki=CAR[4].datafloat;
@@ -147,11 +150,11 @@ while(TRUE)
         case 0x01://百年校庆图标模式
         {
           //MENU_Suspend();          //菜单挂起
-          DISP_SSD1306_BufferUpload((uint8*) DISP_image_100thAnniversary);   //百年校庆图像显示
+          //DISP_SSD1306_BufferUpload((uint8*) DISP_image_100thAnniversary);   //百年校庆图像显示
           while(TRUE)
           {
               prem_flag = mode_flag;
-              SDK_DelayAtLeastUs(2000000,180*1000*1000);
+              //SDK_DelayAtLeastUs(2000000,180*1000*1000);
               //if(prem_flag != mode_flag) break;     //如果标志位发生改变则打断循环
               if(mode_flag != 0x01) break;
           }
@@ -194,9 +197,9 @@ while(TRUE)
         }break;
         case 0x03://电磁跑车模式
                 {
-                    MENU_Suspend();
-                    DISP_SSD1306_Fill(0);
-                    SDK_DelayAtLeastUs(5000000,180*1000*1000);
+                    //MENU_Suspend();
+                    //DISP_SSD1306_Fill(0);
+                    //SDK_DelayAtLeastUs(5000000,180*1000*1000);
                     delay_runcar = 0;//延迟发车标志位
                 while(TRUE)
                  {
@@ -287,8 +290,8 @@ void elec_runcar(void)//电磁跑车函数
 }
 void mode_switch(void)//模式切换中断回调函数
 {
-    (GPIO_PinRead(P33, 12) == 0)? ((*p_mflag) |= 0x01):((*p_mflag) &= 0xfe);
-    (GPIO_PinRead(P33, 13) == 0)? ((*p_mflag) |= 0x02):((*p_mflag) &= 0xfd);
+    (GPIO_Read(P33, 12) == 0)? ((*p_mflag) |= 0x01):((*p_mflag) &= 0xfe);
+    (GPIO_Read(P33, 13) == 0)? ((*p_mflag) |= 0x02):((*p_mflag) &= 0xfd);
     //(GPIO_PinRead(GPIOA,13) == 0)? ((*p_mflag) |= 0x04):((*p_mflag) &= 0xfb);
     //(GPIO_PinRead(GPIOA,15) == 0)? ((*p_mflag) |= 0x08):((*p_mflag) &= 0xf7);
 }

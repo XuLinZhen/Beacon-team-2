@@ -162,10 +162,11 @@ MenuItem_t *MenuCreate(void)
  */
 void MenuPrint(MenuItem_t *Menu, MenuItem_t *currItem)  //再加一项当前指针
 {
-    DISP_SSD1306_Fill(0);
+    SmartCar_OLED_Fill(0);
     int x = 0, y = 2;   //菜单项在y = 2开始
-    SmartCar_OLED_Printf6x8(0, 0,"%s     %d/%d", Menu->Item_name,currItem->list_ID, Menu->Item_data->dataint);
     SmartCar_OLED_Printf6x8(0, 1,"---------------------");
+    SmartCar_OLED_Printf6x8(0, 0,"%s     %d/%d", Menu->Item_name,currItem->list_ID, Menu->Item_data->dataint);
+
     int start_print_ID;
     MenuItem_t *pctrl = Menu->Child_list;
     start_print_ID = currItem->list_ID <= 6? 1:currItem->list_ID - 5;   //滚动式菜单，
@@ -214,7 +215,7 @@ int ButtonRead(void)
     {
         button_operation = right;
     }
-    if (!GPIO_Read(GPIOE, 10))
+    if (!GPIO_Read(P22,3) && !GPIO_Read(P22,2))
     {
         button_operation = OK;
     }
@@ -345,7 +346,7 @@ MenuItem_t *GetRoot(MenuItem_t *currItem)       //获取当前操作的菜单项所属的菜单
 void ItemPrint(MenuItem_t *currItem, int32 pos, int32 *data_array, int32 length)
 {
     int flag=0;
-    DISP_SSD1306_Fill(0);
+    SmartCar_OLED_Fill(0);
     int max_digit = length;//sizeof(data_array) / sizeof(int32_t);
 
     SmartCar_OLED_Printf6x8(0, 0,"  %s   [%d,%d]", currItem->Item_name, currItem->data_range[min], currItem->data_range[max]);

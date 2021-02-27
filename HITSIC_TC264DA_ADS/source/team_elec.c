@@ -15,14 +15,14 @@ float AD[2]={0,0};//保存滤波后数据数组
 
 void LV_Sample(void)                             // ad采集函数
 {
-    ADC[1]=SCADC_Sample(ADC0,0,12);
-    ADC[7]=SCADC_Sample(ADC0,0,18);
+    //ADC[1]=SCADC_Sample(ADC0,0,12);
+    //ADC[7]=SCADC_Sample(ADC0,0,18);
 
   for(int i=0 ; i < SampleTimes; i++)
   {
     /*获取采样初值*/
-    LV_Temp[0][i]=(int)SCADC_Sample(ADC0,0,12);//左电感
-    LV_Temp[1][i]=(int)SCADC_Sample(ADC0,0,18);//右电感
+    //LV_Temp[0][i]=(int)SCADC_Sample(ADC0,0,12);//左电感
+    //LV_Temp[1][i]=(int)SCADC_Sample(ADC0,0,18);//右电感
 
   }
 }

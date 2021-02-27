@@ -2,7 +2,7 @@ LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/arch
 LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/name=Local
 LaunchTargetManager/org.eclipse.launchbar.core.launchTargetType.local,Local/os=win32
 activeLaunchTarget=null\:---
-configDescList=
+configDescList=org.eclipse.launchbar.core.descriptorType.default\:HITSIC_TC264DA_ADS
 eclipse.preferences.version=1
-org.eclipse.launchbar.core.descriptorType.default\:HITSIC_TC264DA_ADS/activeLaunchMode=run
+org.eclipse.launchbar.core.descriptorType.default\:HITSIC_TC264DA_ADS/activeLaunchMode=debug
 org.eclipse.launchbar.core.descriptorType.default\:HITSIC_TC264DA_ADS/activeLaunchTarget=org.eclipse.launchbar.core.launchTargetType.local\:Local
