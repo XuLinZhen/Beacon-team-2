@@ -37,7 +37,7 @@ cardata c_data[2]=
 };
 void Motor_ctr(void)//电机控制闭环
 {
-
+    //1
     /*mot_left =  SCFTM_GetSpeed(FTM1);
     SCFTM_ClearSpeed(FTM1);//测试差速时可以注释掉
     mot_right = -SCFTM_GetSpeed(FTM2);
@@ -46,6 +46,7 @@ void Motor_ctr(void)//电机控制闭环
     else    Motor_pid();
     if(delay_runcar == 0)//延迟发车
     {
+        //1
         //SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_0, 20000U,0U);
         //SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_1, 20000U, 0U);
         //SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_3, 20000U, 0U);
@@ -61,6 +62,7 @@ void Motor_ctr(void)//电机控制闭环
     if(M_right_pwm>50.0) {p = &M_right_pwm;*p = 50.0;}
     else if(M_right_pwm<-50.0) {p = &M_right_pwm;*p = -50.0;}
     else p = NULL;
+    //2
     /*限幅代码*/
     /*if((ADC[1]<=40&&ADC[7]<=40)||delay_runcar==0)
     {
@@ -70,6 +72,7 @@ void Motor_ctr(void)//电机控制闭环
     SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_3, 20000U, 0U);//左轮正转kFTM_Chnl_3> kFTM_Chnl_2
     }
     else*/
+    //2
     if(M_right_pwm>0)
     {
     //SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_0, 20000U,M_right_pwm);//右轮正转kFTM_Chnl_0> kFTM_Chnl_1
@@ -104,9 +107,11 @@ void servo_init(float *pwm)
 }
 void servo_pid()
 {
+    //2
     //servo_init(&(c_data[0].servo_pwm));
     float pwm_error = 0;
     error_n = get_error();
+    //2
     //error_n = Get_erro();
     pwm_error = c_data[0].Kp*error_n+c_data[0].Kd*(error_n-error_n_1);
     c_data[0].servo_pwm=c_data[0].servo_mid+pwm_error;
@@ -120,6 +125,7 @@ void servo_pid()
 
 void servo()
 {
+    //2
     //servo_pid();
     if(c_data[0].servo_pwm<6.8)
             c_data[0].servo_pwm=6.8;

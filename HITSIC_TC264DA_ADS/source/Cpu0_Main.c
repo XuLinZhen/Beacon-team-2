@@ -85,6 +85,12 @@ int core0_main(void)
     Pit_Init(CCU6_0,PIT_CH1,3000*1000);  //舵机
     Pit_Init(CCU6_1,PIT_CH0,7000*1000);  //状态切换
     //Pit_Init(CCU6_1,PIT_CH1,1000*1000);  //待定
+    /** PWM初始化 */
+    SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_4_TOUT4_P02_4_OUT, 20000, 0);
+    SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_5_TOUT5_P02_5_OUT, 200, 0);
+    SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_6_TOUT6_P02_6_OUT, 50, 0);
+    SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_7_TOUT7_P02_7_OUT, 50, 0);
+    SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_1_TOUT31_P33_9_OUT, 50, 0);
     /** 初始化OLED屏幕  */
     SmartCar_Oled_Init();
     extern const uint8 DISP_image_100thAnniversary[8][128];
@@ -119,17 +125,22 @@ while(1)
         case 0x00:
         {
 
+            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_4_TOUT4_P02_4_OUT,2000);
+            //SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_5_TOUT5_P02_5_OUT,1000);
+            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_1_TOUT31_P33_9_OUT,751);
+
             MenuPrint(MenuRoot, currItem);                  //构建菜单并打印
             //当标志位为0时:
             delay_runcar = 0;  //延迟发车标志位置为0
             while(1)
             {
-                ssss[0]=1;
+                /*ssss[0]=1;
                 ssss[1]+=2;
-                SmartCar_VarUpload(ssss,2);
+                SmartCar_VarUpload(ssss,2);*/
                 currItem = ButtonProcess(GetRoot(currItem), currItem);
                 servo_init(&(c_data[0].servo_pwm));//舵机初始化
                 Motorsp_Init();    //电机速度初始化
+                SmartCar_VarUpload(&wifidata[0],12);//WiFi上传数据
                 //如果标志位发生改变则打断循环
                 if(mode_flag != 0x00) break;
             }
@@ -156,7 +167,6 @@ while(1)
             while(1)
                {
                //if(delay_runcar==1) pitMgr_t::remove(*p);//测试不再延迟发车，清除定时器中断
-               prem_flag = mode_flag;
                //摄像头跑车程序内容
                while (!mt9v034_finish_flag){}
                mt9v034_finish_flag = 0;
@@ -168,6 +178,7 @@ while(1)
                /* 传图 */
                //SmartCar_ImgUpload((uint8*) mt9v034_image, 120, 188);
                /********/
+               SmartCar_VarUpload(&wifidata[0],12);//WiFi上传数据
                if(mode_flag != 0x02) break;
                }
             banmaxian_flag = 0;//斑马线识别标志位
@@ -181,6 +192,7 @@ while(1)
             prem_flag = mode_flag;
             elec_runcar();
             SmartCar_OLED_Printf6x8(30,5,"%c","elecmode");
+            SmartCar_VarUpload(&wifidata[0],12);//WiFi上传数据
             if(mode_flag != 0x03) break;
           }
         }break;

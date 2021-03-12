@@ -6188,3 +6188,78 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64 -perspective com.infin
 !MESSAGE The GDI debug instrument provided the following error message.
 !SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-02-27 19:30:39.115
 !MESSAGE Could not open Access HW
+!SESSION 2021-03-07 10:03:52.817 -----------------------------------------------
+eclipse.buildId=1.3.0
+java.version=11.0.2
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=zh_CN
+Framework arguments:  -perspective com.infineon.aurix.buildmanager.perspective.c
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -perspective com.infineon.aurix.buildmanager.perspective.c
+
+!ENTRY com.tasking.debug.cdt.core 4 150 2021-03-07 11:26:42.245
+!MESSAGE Error creating session 
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-03-07 11:26:42.245
+!MESSAGE The debug instrument IO could not be initialized.
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-03-07 11:26:42.245
+!MESSAGE The GDI debug instrument provided the following error message.
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-03-07 11:26:42.245
+!MESSAGE Could not open Access HW
+!SESSION 2021-03-08 15:47:25.638 -----------------------------------------------
+eclipse.buildId=1.3.0
+java.version=11.0.2
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=zh_CN
+Framework arguments:  -perspective com.infineon.aurix.buildmanager.perspective.c
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -perspective com.infineon.aurix.buildmanager.perspective.c
+
+!ENTRY com.tasking.debug.cdt.core 4 150 2021-03-08 16:58:47.196
+!MESSAGE Error creating session 
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-03-08 16:58:47.196
+!MESSAGE The debug instrument IO could not be initialized.
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-03-08 16:58:47.196
+!MESSAGE The GDI debug instrument provided the following error message.
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-03-08 16:58:47.196
+!MESSAGE Could not open Access HW
+!SESSION 2021-03-12 18:01:54.871 -----------------------------------------------
+eclipse.buildId=1.3.0
+java.version=11.0.2
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=zh_CN
+Framework arguments:  -perspective com.infineon.aurix.buildmanager.perspective.c
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -perspective com.infineon.aurix.buildmanager.perspective.c
+
+!ENTRY org.eclipse.cdt.debug.core 4 1000 2021-03-12 18:15:48.426
+!MESSAGE Internal error logged from CDI Debug: 
+!STACK 1
+org.eclipse.debug.core.DebugException: Loading failed: Without direct access, flashing is not possible if the target is running.
+	at com.tasking.debug.cdt.core.DarwinDebugModel.loadApplication(DarwinDebugModel.java:227)
+	at com.tasking.debug.cdt.core.DarwinDebugModel$1.run(DarwinDebugModel.java:387)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2292)
+	at org.eclipse.core.internal.resources.Workspace.run(Workspace.java:2312)
+	at com.tasking.debug.cdt.core.DarwinDebugModel.newDebugTarget(DarwinDebugModel.java:426)
+	at com.tasking.cdt.launch.internal.LocalRunLaunchDelegate.launch(LocalRunLaunchDelegate.java:204)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:807)
+	at org.eclipse.debug.internal.core.LaunchConfiguration.launch(LaunchConfiguration.java:718)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin.buildAndLaunch(DebugUIPlugin.java:1021)
+	at org.eclipse.debug.internal.ui.DebugUIPlugin$2.run(DebugUIPlugin.java:1224)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 10000 2021-03-12 18:15:48.427
+!MESSAGE Loading failed: Without direct access, flashing is not possible if the target is running.
+
+!ENTRY com.tasking.debug.cdt.core 4 150 2021-03-12 18:16:04.528
+!MESSAGE Error creating session 
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-03-12 18:16:04.528
+!MESSAGE The debug instrument IO could not be initialized.
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-03-12 18:16:04.528
+!MESSAGE The GDI debug instrument provided the following error message.
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-03-12 18:16:04.528
+!MESSAGE Could not open Access HW
+
+!ENTRY com.tasking.debug.cdt.core 4 150 2021-03-12 18:20:40.291
+!MESSAGE Error creating session 
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-03-12 18:20:40.291
+!MESSAGE The debug instrument IO could not be initialized.
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-03-12 18:20:40.291
+!MESSAGE The GDI debug instrument provided the following error message.
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-03-12 18:20:40.291
+!MESSAGE Could not open Access HW
