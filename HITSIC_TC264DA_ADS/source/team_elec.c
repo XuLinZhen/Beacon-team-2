@@ -106,6 +106,7 @@ float Get_erro(void)
     LV_Sample();
     LV_Get_Val();
     LV_Sort();
+    //2
     //Normalized();
     float *p;
     p = LV_average();
