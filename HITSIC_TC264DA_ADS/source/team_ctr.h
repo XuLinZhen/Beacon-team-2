@@ -13,6 +13,7 @@
 #include "image.h"
 #include "team_elec.h"
 #include "math.h"
+#include "IfxGtm_PinMap.h"
 //#include"sc_host.h"
 
 extern float error_n;//偏差值，定义为全局变量，为了在菜单显示

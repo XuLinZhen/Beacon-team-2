@@ -31,13 +31,14 @@
 #include "SmartCar_GPIO.h"
 #include "SmartCar_Uart.h"
 #include "SmartCar_Upload.h"
-#include "SmartCar_Oled.h"
+#include "Oled.h"
 #include "SmartCar_Pwm.h"
 #include "SmartCar_MPU.h"
 #include "SmartCar_MT9V034.h"
 #include "SmartCar_Systick.h"
 #include "SmartCar_PIT.h"
 #include "common.h"
+#include "SmartCar_Encoder.h"
 
 #include "team_ctr.h"
 #include "team_elec.h"
@@ -76,21 +77,27 @@ int core0_main(void)
     IfxCpu_emitEvent(&g_cpuSyncEvent);
     IfxCpu_waitEvent(&g_cpuSyncEvent, 1);
     /** GPIO初始化 */
-    GPIO_Init(P22,0, PUSHPULL,1);
-    GPIO_Init(P22,1, PUSHPULL,1);
-    GPIO_Init(P22,2, PUSHPULL,1);
-    GPIO_Init(P22,3, PUSHPULL,1);
+    GPIO_Init(P15,0, PUSHPULL,1);
+    GPIO_Init(P15,1, PUSHPULL,1);
+    GPIO_Init(P15,2, PUSHPULL,1);
+    GPIO_Init(P15,3, PUSHPULL,1);
+    GPIO_Init(P15,4, PUSHPULL,1);//五项按键
+    GPIO_Init(P20,8, PUSHPULL,1);
+    GPIO_Init(P20,9, PUSHPULL,1);//拨码开关
     /** 定时中断初始化 */
     Pit_Init(CCU6_0,PIT_CH0,1000*1000);  //电机
     Pit_Init(CCU6_0,PIT_CH1,3000*1000);  //舵机
     Pit_Init(CCU6_1,PIT_CH0,7000*1000);  //状态切换
     //Pit_Init(CCU6_1,PIT_CH1,1000*1000);  //待定
+    /** 编码器初始化 */
+    //SmartCar_Encoder_Init(GPT12_T2, IfxGtm_TIM0_2_TIN28_P33_6_IN, IfxGtm_TIM1_3_TIN29_P33_7_IN);
+    //SmartCar_Encoder_Init(GPT12_T3, IfxGtm_TIM0_3_TIN105_P10_3_IN, IfxGtm_TIM0_1_TIN103_P10_1_IN);
     /** PWM初始化 */
-    SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_4_TOUT4_P02_4_OUT, 20000, 0);
-    SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_5_TOUT5_P02_5_OUT, 200, 0);
-    SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_6_TOUT6_P02_6_OUT, 50, 0);
-    SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_7_TOUT7_P02_7_OUT, 50, 0);
-    SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_1_TOUT31_P33_9_OUT, 50, 0);
+    SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, 20000, 2000);
+    SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_1_TOUT54_P21_3_OUT, 200, 2000);
+    SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_2_TOUT55_P21_4_OUT, 50, 2000);
+    SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_3_TOUT56_P21_5_OUT, 50, 0);
+    SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_5_TOUT58_P21_7_OUT, 50, 0);
     /** 初始化OLED屏幕  */
     SmartCar_Oled_Init();
     extern const uint8 DISP_image_100thAnniversary[8][128];
@@ -118,6 +125,8 @@ int core0_main(void)
     c_data[0].Kd=CAR[9].datafloat;
     c_data[0].servo_mid=CAR[10].datafloat;
     threshold=CAR[13].dataint;
+    int a=0;
+    SmartCar_OLED_Printf6x8(0, 0,"%d", a);
 while(1)
 {
     switch(mode_flag)//菜单模式
@@ -125,18 +134,15 @@ while(1)
         case 0x00:
         {
 
-            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_4_TOUT4_P02_4_OUT,2000);
-            //SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_5_TOUT5_P02_5_OUT,1000);
-            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_1_TOUT31_P33_9_OUT,751);
+            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT,2000);
+            //SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_2_TOUT55_P21_4_OUT,1000);
+            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_5_TOUT58_P21_7_OUT,751);
 
             MenuPrint(MenuRoot, currItem);                  //构建菜单并打印
             //当标志位为0时:
             delay_runcar = 0;  //延迟发车标志位置为0
             while(1)
             {
-                /*ssss[0]=1;
-                ssss[1]+=2;
-                SmartCar_VarUpload(ssss,2);*/
                 currItem = ButtonProcess(GetRoot(currItem), currItem);
                 servo_init(&(c_data[0].servo_pwm));//舵机初始化
                 Motorsp_Init();    //电机速度初始化
@@ -239,22 +245,22 @@ void elec_runcar(void)//电磁跑车函数
 }
 void mode_switch(void)//模式切换中断回调函数
 {
-    if(GPIO_Read(P33, 12) == 1 && GPIO_Read(P33, 13) == 1)
+    if(GPIO_Read(P20, 8) == 1 && GPIO_Read(P20, 9) == 1)
     {
         //(*p_mflag) |= 0x01;
         mode_flag=0;
     }
-    else if(GPIO_Read(P33, 12) != 1 && GPIO_Read(P33, 13) == 1)
+    else if(GPIO_Read(P20, 8) != 1 && GPIO_Read(P20, 9) == 1)
     {
         //(*p_mflag) &= 0xfe;
         mode_flag=1;
     }
-    else if(GPIO_Read(P33, 12) == 1 && GPIO_Read(P33, 13) != 1)
+    else if(GPIO_Read(P20, 8) == 1 && GPIO_Read(P20, 9) != 1)
     {
         //(*p_mflag) |= 0x02;
         mode_flag=2;
     }
-    else if(GPIO_Read(P33, 12) != 1 && GPIO_Read(P33, 13) != 1)
+    else if(GPIO_Read(P20, 8) != 1 && GPIO_Read(P20, 9) != 1)
     {
         //(*p_mflag) &= 0xfd;
         mode_flag=3;
@@ -428,27 +434,27 @@ void MenuPrint(MenuItem_t *Menu, MenuItem_t *currItem)  //再加一项当前指针
 int ButtonRead(void)
 {
     int button_operation = 0;
-    if (!GPIO_Read(P22,0))
+    if (!GPIO_Read(P15,0))
     {
         button_operation = up;
         Delay_ms(STM0, 500);
     }
-    if (!GPIO_Read(P22,1))
+    if (!GPIO_Read(P15,2))
     {
         button_operation = down;
         Delay_ms(STM0, 500);
     }
-    if (!GPIO_Read(P22,2) && GPIO_Read(P22,3))
+    if (!GPIO_Read(P15,1))//&& GPIO_Read(P22,3))
     {
         button_operation = left;
         Delay_ms(STM0, 500);
     }
-    if (!GPIO_Read(P22,3) && GPIO_Read(P22,2))
+    if (!GPIO_Read(P15,3))// && GPIO_Read(P22,2))
     {
         button_operation = right;
         Delay_ms(STM0, 500);
     }
-    if (!GPIO_Read(P22,3) && !GPIO_Read(P22,2))
+    if (!GPIO_Read(P15,4))// && !GPIO_Read(P22,2))
     {
         button_operation = OK;
         Delay_ms(STM0, 500);

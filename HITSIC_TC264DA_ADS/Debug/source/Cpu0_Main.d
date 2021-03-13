@@ -2,6 +2,14 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
 Cpu0_Main.o :	../source/Cpu0_Main.c
 ../source/Cpu0_Main.c :
 Cpu0_Main.o :	../Configurations/Ifx_Cfg.h
@@ -20,8 +28,8 @@ Cpu0_Main.o :	../SmartCar/SmartCar_Upload.h
 ../SmartCar/SmartCar_Upload.h :
 Cpu0_Main.o :	../SmartCar/SmartCar_Uart.h
 ../SmartCar/SmartCar_Uart.h :
-Cpu0_Main.o :	../SmartCar/SmartCar_Oled.h
-../SmartCar/SmartCar_Oled.h :
+Cpu0_Main.o :	../SmartCar/Oled.h
+../SmartCar/Oled.h :
 Cpu0_Main.o :	../Libraries/Service/CpuGeneric/If/SpiIf.h
 ../Libraries/Service/CpuGeneric/If/SpiIf.h :
 Cpu0_Main.o :	../SmartCar/SmartCar_FONT.h
@@ -70,6 +78,16 @@ Cpu0_Main.o :	../Libraries/Service/CpuGeneric/SysSe/Bsp/Bsp.h
 ../Libraries/Service/CpuGeneric/SysSe/Bsp/Bsp.h :
 Cpu0_Main.o :	../SmartCar/common.h
 ../SmartCar/common.h :
+Cpu0_Main.o :	../SmartCar/SmartCar_Encoder.h
+../SmartCar/SmartCar_Encoder.h :
+Cpu0_Main.o :	../Libraries/Service/CpuGeneric/StdIf/IfxStdIf_Pos.h
+../Libraries/Service/CpuGeneric/StdIf/IfxStdIf_Pos.h :
+Cpu0_Main.o :	../Libraries/Service/CpuGeneric/StdIf/IfxStdIf.h
+../Libraries/Service/CpuGeneric/StdIf/IfxStdIf.h :
+Cpu0_Main.o :	../Libraries/Service/CpuGeneric/StdIf/IfxStdIf_DPipe.h
+../Libraries/Service/CpuGeneric/StdIf/IfxStdIf_DPipe.h :
+Cpu0_Main.o :	../Libraries/Service/CpuGeneric/_Utilities/Ifx_Assert.h
+../Libraries/Service/CpuGeneric/_Utilities/Ifx_Assert.h :
 Cpu0_Main.o :	../source/team_ctr.h
 ../source/team_ctr.h :
 Cpu0_Main.o :	../SmartCar/common.h

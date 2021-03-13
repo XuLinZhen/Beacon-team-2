@@ -4,6 +4,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../SmartCar/Oled.c \
 ../SmartCar/SmartCar_ADC.c \
 ../SmartCar/SmartCar_Assert.c \
 ../SmartCar/SmartCar_Encoder.c \
@@ -15,7 +16,6 @@ C_SRCS += \
 ../SmartCar/SmartCar_Hardware_IIC.c \
 ../SmartCar/SmartCar_MPU.c \
 ../SmartCar/SmartCar_MT9V034.c \
-../SmartCar/SmartCar_Oled.c \
 ../SmartCar/SmartCar_PIT.c \
 ../SmartCar/SmartCar_Pwm.c \
 ../SmartCar/SmartCar_Soft_IIC.c \
@@ -25,6 +25,7 @@ C_SRCS += \
 ../SmartCar/common.c 
 
 OBJS += \
+./SmartCar/Oled.o \
 ./SmartCar/SmartCar_ADC.o \
 ./SmartCar/SmartCar_Assert.o \
 ./SmartCar/SmartCar_Encoder.o \
@@ -36,7 +37,6 @@ OBJS += \
 ./SmartCar/SmartCar_Hardware_IIC.o \
 ./SmartCar/SmartCar_MPU.o \
 ./SmartCar/SmartCar_MT9V034.o \
-./SmartCar/SmartCar_Oled.o \
 ./SmartCar/SmartCar_PIT.o \
 ./SmartCar/SmartCar_Pwm.o \
 ./SmartCar/SmartCar_Soft_IIC.o \
@@ -46,6 +46,7 @@ OBJS += \
 ./SmartCar/common.o 
 
 COMPILED_SRCS += \
+./SmartCar/Oled.src \
 ./SmartCar/SmartCar_ADC.src \
 ./SmartCar/SmartCar_Assert.src \
 ./SmartCar/SmartCar_Encoder.src \
@@ -57,7 +58,6 @@ COMPILED_SRCS += \
 ./SmartCar/SmartCar_Hardware_IIC.src \
 ./SmartCar/SmartCar_MPU.src \
 ./SmartCar/SmartCar_MT9V034.src \
-./SmartCar/SmartCar_Oled.src \
 ./SmartCar/SmartCar_PIT.src \
 ./SmartCar/SmartCar_Pwm.src \
 ./SmartCar/SmartCar_Soft_IIC.src \
@@ -67,6 +67,7 @@ COMPILED_SRCS += \
 ./SmartCar/common.src 
 
 C_DEPS += \
+./SmartCar/Oled.d \
 ./SmartCar/SmartCar_ADC.d \
 ./SmartCar/SmartCar_Assert.d \
 ./SmartCar/SmartCar_Encoder.d \
@@ -78,7 +79,6 @@ C_DEPS += \
 ./SmartCar/SmartCar_Hardware_IIC.d \
 ./SmartCar/SmartCar_MPU.d \
 ./SmartCar/SmartCar_MT9V034.d \
-./SmartCar/SmartCar_Oled.d \
 ./SmartCar/SmartCar_PIT.d \
 ./SmartCar/SmartCar_Pwm.d \
 ./SmartCar/SmartCar_Soft_IIC.d \
