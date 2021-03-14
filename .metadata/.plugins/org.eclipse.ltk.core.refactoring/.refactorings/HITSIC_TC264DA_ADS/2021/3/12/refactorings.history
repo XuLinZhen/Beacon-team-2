@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;HITSIC_TC264DA_ADS/SmartCar/SmartCar_Oled.h&apos; to &apos;Oled.h&apos;" description="Rename resource &apos;SmartCar_Oled.h&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="SmartCar/SmartCar_Oled.h" name="Oled.h" stamp="1615708856211" updateReferences="true"/>
+</session>
