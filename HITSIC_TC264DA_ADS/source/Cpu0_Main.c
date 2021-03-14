@@ -625,7 +625,14 @@ void ItemPrint(MenuItem_t *currItem, int32 pos, int32 *data_array, int32 length)
     }
     else
     {
-        SmartCar_OLED_Printf6x8(42 + (pos-1)*6, 4, "^");
+        if (pos <= (max_digit-4))
+        {
+            SmartCar_OLED_Printf6x8(42 + (pos-1)*6, 4, "^");
+        }
+        else if (pos > (max_digit-4))
+        {
+            SmartCar_OLED_Printf6x8(42 + (pos)*6, 4, "^");
+        }
     }
     int Item_dataint = ArrayToDataint(data_array, max_digit);
     /*switch (currItem->ID)
