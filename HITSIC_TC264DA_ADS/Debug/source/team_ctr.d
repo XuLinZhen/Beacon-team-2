@@ -38,10 +38,6 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
-################################################################################
-# Automatically-generated file. Do not edit!
-################################################################################
-
 team_ctr.o :	../source/team_ctr.c
 ../source/team_ctr.c :
 team_ctr.o :	../source/team_ctr.h

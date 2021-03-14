@@ -34,7 +34,7 @@
  * count_pin:IfxGpt120_T4INA_P02_8_IN IfxGpt120_T4INB_P10_8_IN
  * dir_pin:IfxGpt120_T4EUDA_P00_9_IN IfxGpt120_T4EUDB_P33_5_IN
  * T5:
- * count_pin:IfxGpt120_T5INA_P21_7_IN IfxGpt120_T5INB_P10_3_IN
+ * count_pin:IfxGpt120_T5INA_P21_7_IN IfxGpt120_T5INB_P10_3_IN4
  * dir_pin:IfxGpt120_T5EUDA_P21_6_IN IfxGpt120_T5EUDB_P10_1_IN
  * T6:
  * count_pin:IfxGpt120_T6INA_P20_3_IN IfxGpt120_T6INB_P10_2_IN

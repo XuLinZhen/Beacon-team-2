@@ -41,8 +41,8 @@ void Motor_ctr(void)//电机控制闭环
     //1
     mot_left =  SmartCar_Encoder_Get(GPT12_T2);
     SmartCar_Encoder_Clear(GPT12_T2);//测试差速时可以注释掉
-    mot_right = -SmartCar_Encoder_Get(GPT12_T3);
-    SmartCar_Encoder_Clear(GPT12_T3);//测试差速时可以注释掉
+    mot_right = -SmartCar_Encoder_Get(GPT12_T6);
+    SmartCar_Encoder_Clear(GPT12_T6);//测试差速时可以注释掉
     if(banmaxian_flag == 1||out_flag == 1) {Motorsp_Set(0.0,0.0);Motor_pid();}
     else    Motor_pid();
     if(delay_runcar == 0)//延迟发车
