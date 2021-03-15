@@ -94,7 +94,7 @@ int core0_main(void)
     // SmartCar_MT9V034_Init();
     /** 初始化串口 */
     SmartCar_Uart_Init(IfxAsclin0_TX_P14_0_OUT,IfxAsclin0_RXA_P14_1_IN,1152000,0);
-    SmartCar_Uart_Init(IfxAsclin2_TX_P10_5_OUT,IfxAsclin2_RXD_P10_6_IN,921600,0);
+    //SmartCar_Uart_Init(IfxAsclin2_TX_P10_5_OUT,IfxAsclin2_RXD_P10_6_IN,921600,0);
     /** 初始化ADC */
     ADC_Init(ADC_1, ADC1_CH4_A20);
     ADC_Init(ADC_1, ADC1_CH5_A21);
@@ -117,7 +117,7 @@ int core0_main(void)
     c_data[0].Kd=CAR[9].datafloat;
     c_data[0].servo_mid=CAR[10].datafloat;
     threshold=CAR[13].dataint;
-    uint32 adc[2]={0};
+    float adc[2]={0};
 while(1)
 {
     switch(mode_flag)//菜单模式
