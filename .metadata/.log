@@ -6188,3 +6188,13 @@ Command-line arguments:  -os win32 -ws win32 -arch x86_64 -perspective com.infin
 !MESSAGE The GDI debug instrument provided the following error message.
 !SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-02-27 19:30:39.115
 !MESSAGE Could not open Access HW
+
+!ENTRY org.eclipse.cdt.debug.core 4 1000 2021-03-15 20:02:38.168
+!MESSAGE Internal error logged from CDI Debug: 
+!STACK 1
+org.eclipse.debug.core.DebugException: Loading failed: Target is not responding (timed out)
+	at com.tasking.debug.cdt.core.DarwinDebugModel.loadApplication(DarwinDebugModel.java:227)
+	at com.tasking.debug.cdt.core.DarwinDebugModel$2.run(DarwinDebugModel.java:558)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 10000 2021-03-15 20:02:38.169
+!MESSAGE Loading failed: Target is not responding (timed out)

@@ -38,6 +38,7 @@
 #include "SmartCar_Systick.h"
 #include "SmartCar_PIT.h"
 #include "common.h"
+#include "SmartCar_ADC.h"
 
 #include "team_ctr.h"
 #include "team_elec.h"
@@ -93,6 +94,10 @@ int core0_main(void)
     // SmartCar_MT9V034_Init();
     /** 初始化串口 */
     SmartCar_Uart_Init(IfxAsclin0_TX_P14_0_OUT,IfxAsclin0_RXA_P14_1_IN,1152000,0);
+    SmartCar_Uart_Init(IfxAsclin2_TX_P10_5_OUT,IfxAsclin2_RXD_P10_6_IN,921600,0);
+    /** 初始化ADC */
+    ADC_Init(ADC_1, ADC1_CH4_A20);
+    ADC_Init(ADC_1, ADC1_CH5_A21);
     /** 初始化菜单 */
     MenuItem_t* MenuRoot = MenuCreate();
     MenuItem_t *currItem = MenuRoot->Child_list;
@@ -112,6 +117,7 @@ int core0_main(void)
     c_data[0].Kd=CAR[9].datafloat;
     c_data[0].servo_mid=CAR[10].datafloat;
     threshold=CAR[13].dataint;
+    uint32 adc[2]={0};
 while(1)
 {
     switch(mode_flag)//菜单模式
@@ -124,9 +130,11 @@ while(1)
             delay_runcar = 0;  //延迟发车标志位置为0
             while(1)
             {
-                ssss[0]=1;
-                ssss[1]+=2;
-                SmartCar_VarUpload(ssss,2);
+                adc[0]=ADC_Get(ADC_1, ADC1_CH4_A20, ADC_12BIT);
+                adc[1]+=0.2;
+                //ssss[0]=1;
+                //ssss[1]+=2;
+                SmartCar_VarUpload(adc,2);
                 currItem = ButtonProcess(GetRoot(currItem), currItem);
                 servo_init(&(c_data[0].servo_pwm));//舵机初始化
                 Motorsp_Init();    //电机速度初始化
