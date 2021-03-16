@@ -38,13 +38,13 @@
 #include "SmartCar_Systick.h"
 #include "SmartCar_PIT.h"
 #include "common.h"
-#include "SmartCar_ADC.h"
 
 #include "team_ctr.h"
 #include "team_elec.h"
 #include "image.h"
 #include "my_math.h"
 #include "menu.h"
+#include "SmartCar_ADC.h"
 
 #pragma section all "cpu0_dsram"
 //IfxCpu_syncEvent g_cpuSyncEvent;
@@ -85,19 +85,17 @@ int core0_main(void)
     Pit_Init(CCU6_0,PIT_CH0,1000*1000);  //电机
     Pit_Init(CCU6_0,PIT_CH1,3000*1000);  //舵机
     Pit_Init(CCU6_1,PIT_CH0,7000*1000);  //状态切换
-    //Pit_Init(CCU6_1,PIT_CH1,1000*1000);  //待定
+    //Pit_Init(CCU6_1,PIT_CH1,1*1000);  //待定
     /** 初始化OLED屏幕  */
     SmartCar_Oled_Init();
     extern const uint8 DISP_image_100thAnniversary[8][128];
     SmartCar_Buffer_Upload((uint8*) DISP_image_100thAnniversary);
+    /** ADC */
+    ADC_Init(ADC_1, ADC1_CH4_A20);
     /** 初始化摄像头 */
     // SmartCar_MT9V034_Init();
     /** 初始化串口 */
     SmartCar_Uart_Init(IfxAsclin0_TX_P14_0_OUT,IfxAsclin0_RXA_P14_1_IN,1152000,0);
-    //SmartCar_Uart_Init(IfxAsclin2_TX_P10_5_OUT,IfxAsclin2_RXD_P10_6_IN,921600,0);
-    /** 初始化ADC */
-    ADC_Init(ADC_1, ADC1_CH4_A20);
-    ADC_Init(ADC_1, ADC1_CH5_A21);
     /** 初始化菜单 */
     MenuItem_t* MenuRoot = MenuCreate();
     MenuItem_t *currItem = MenuRoot->Child_list;
@@ -117,7 +115,6 @@ int core0_main(void)
     c_data[0].Kd=CAR[9].datafloat;
     c_data[0].servo_mid=CAR[10].datafloat;
     threshold=CAR[13].dataint;
-    float adc[2]={0};
 while(1)
 {
     switch(mode_flag)//菜单模式
@@ -130,11 +127,9 @@ while(1)
             delay_runcar = 0;  //延迟发车标志位置为0
             while(1)
             {
-                adc[0]=ADC_Get(ADC_1, ADC1_CH4_A20, ADC_12BIT);
-                adc[1]+=0.2;
-                //ssss[0]=1;
-                //ssss[1]+=2;
-                SmartCar_VarUpload(adc,2);
+                ssss[0]+=0.1;
+                ssss[1]=ADC_Get(ADC_1, ADC1_CH4_A20, ADC_12BIT);
+                SmartCar_VarUpload(ssss,2);
                 currItem = ButtonProcess(GetRoot(currItem), currItem);
                 servo_init(&(c_data[0].servo_pwm));//舵机初始化
                 Motorsp_Init();    //电机速度初始化
@@ -174,7 +169,7 @@ while(1)
                Speed_radio((c_data[0].servo_pwm-c_data[0].servo_mid));
                SmartCar_Show_IMG((uint8*) mt9v034_image, 120, 188);
                /* 传图 */
-               //SmartCar_ImgUpload((uint8*) mt9v034_image, 120, 188);
+               SmartCar_ImgUpload((uint8*) mt9v034_image, 120, 188);
                /********/
                if(mode_flag != 0x02) break;
                }
@@ -226,6 +221,12 @@ IFX_INTERRUPT(cc61_pit_ch0_isr, 0, CCU6_1_CH0_ISR_PRIORITY)
 /*IFX_INTERRUPT(cc61_pit_ch1_isr, 0, CCU6_1_CH1_ISR_PRIORITY)
 {
     enableInterrupts();//开启中断嵌套
+    //while (!mt9v034_finish_flag){}
+    if(mt9v034_finish_flag==1)
+    {
+        mt9v034_finish_flag = 0;
+    }
+
     PIT_CLEAR_FLAG(CCU6_1, PIT_CH1);
 
 }*/

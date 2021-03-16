@@ -70,12 +70,6 @@ Cpu0_Main.o :	../Libraries/Service/CpuGeneric/SysSe/Bsp/Bsp.h
 ../Libraries/Service/CpuGeneric/SysSe/Bsp/Bsp.h :
 Cpu0_Main.o :	../SmartCar/common.h
 ../SmartCar/common.h :
-Cpu0_Main.o :	../SmartCar/SmartCar_ADC.h
-../SmartCar/SmartCar_ADC.h :
-Cpu0_Main.o :	../Libraries/Service/CpuGeneric/_Utilities/Ifx_Assert.h
-../Libraries/Service/CpuGeneric/_Utilities/Ifx_Assert.h :
-Cpu0_Main.o :	../SmartCar/common.h
-../SmartCar/common.h :
 Cpu0_Main.o :	../source/team_ctr.h
 ../source/team_ctr.h :
 Cpu0_Main.o :	../SmartCar/common.h
@@ -98,6 +92,8 @@ Cpu0_Main.o :	../Libraries/Service/CpuGeneric/StdIf/IfxStdIf_DPipe.h
 ../Libraries/Service/CpuGeneric/StdIf/IfxStdIf_DPipe.h :
 Cpu0_Main.o :	../Libraries/Service/CpuGeneric/_Utilities/Ifx_Assert.h
 ../Libraries/Service/CpuGeneric/_Utilities/Ifx_Assert.h :
+Cpu0_Main.o :	../SmartCar/common.h
+../SmartCar/common.h :
 Cpu0_Main.o :	../source/team_elec.h
 ../source/team_elec.h :
 Cpu0_Main.o :	../source/image.h
@@ -112,3 +108,9 @@ Cpu0_Main.o :	../SmartCar/common.h
 ../SmartCar/common.h :
 Cpu0_Main.o :	../Libraries/Service/CpuGeneric/_Utilities/Ifx_Assert.h
 ../Libraries/Service/CpuGeneric/_Utilities/Ifx_Assert.h :
+Cpu0_Main.o :	../SmartCar/SmartCar_ADC.h
+../SmartCar/SmartCar_ADC.h :
+Cpu0_Main.o :	../Libraries/Service/CpuGeneric/_Utilities/Ifx_Assert.h
+../Libraries/Service/CpuGeneric/_Utilities/Ifx_Assert.h :
+Cpu0_Main.o :	../SmartCar/common.h
+../SmartCar/common.h :

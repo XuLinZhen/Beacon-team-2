@@ -21,6 +21,7 @@
 #include "SmartCar_Encoder.h"
 
 
+
 /*
  * check in file Libraries/iLLD/TC26B/Tricore/_PinMap/IfxI2c_PinMap.c
   * the possible pin select for Gpt12
