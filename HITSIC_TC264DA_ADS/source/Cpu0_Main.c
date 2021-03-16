@@ -169,7 +169,7 @@ while(1)
                Speed_radio((c_data[0].servo_pwm-c_data[0].servo_mid));
                SmartCar_Show_IMG((uint8*) mt9v034_image, 120, 188);
                /* ´«Í¼ */
-               SmartCar_ImgUpload((uint8*) mt9v034_image, 120, 188);
+               //SmartCar_ImgUpload((uint8*) mt9v034_image, 120, 188);
                /********/
                if(mode_flag != 0x02) break;
                }

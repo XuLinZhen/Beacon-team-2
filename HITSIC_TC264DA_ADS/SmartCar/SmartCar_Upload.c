@@ -48,15 +48,17 @@ void SmartCar_VarUpload(float *my_var, uint8 var_num)
 
 void SmartCar_ImgUpload(uint8 *upload_img, uint8 row, uint8 col)
 {
+    uint8 new_upload_img[120][188]={0};
     uint8 cmd = 3, icmd = ~3;
     uint8 cmdf[2] =
     { cmd, icmd };
     uint8 cmdr[2] =
     { icmd, cmd };
+    memcpy(&new_upload_img[0][0],upload_img,row*col);
     /*! 发送帧头 */
     SmartCar_Uart_Upload(cmdf, sizeof(cmdf));
     /*! 发送数据 */
-    SmartCar_Uart_Upload(upload_img, row * col);
+    SmartCar_Uart_Upload(new_upload_img, row * col);
     /*! 发送帧尾 */
     SmartCar_Uart_Upload(cmdr, sizeof(cmdr));
 }
