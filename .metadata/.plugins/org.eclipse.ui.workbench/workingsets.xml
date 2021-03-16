@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workingSetManager>
-<workingSet editPageId="org.eclipse.ui.resourceWorkingSetPage" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1614147119241_1" label="ActiveProject" name="ActiveProject">
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/HITSIC_TC264DA_ADS" type="4"/>
-</workingSet>
+<workingSet editPageId="org.eclipse.ui.resourceWorkingSetPage" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1614147119241_1" label="ActiveProject" name="ActiveProject"/>
 <workingSet aggregate="true" factoryID="org.eclipse.ui.internal.WorkingSetFactory" id="1614147087896_0" label="Window Working Set" name="Aggregate for window 1614147087896">
 <workingSet IMemento.internal.id="ActiveProject"/>
 </workingSet>

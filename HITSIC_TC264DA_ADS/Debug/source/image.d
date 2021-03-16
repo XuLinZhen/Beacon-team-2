@@ -28,3 +28,11 @@ image.o :	../source/team_elec.h
 ../source/team_elec.h :
 image.o :	../SmartCar/common.h
 ../SmartCar/common.h :
+image.o :	../SmartCar/SmartCar_Encoder.h
+../SmartCar/SmartCar_Encoder.h :
+image.o :	../Libraries/Service/CpuGeneric/StdIf/IfxStdIf_Pos.h
+../Libraries/Service/CpuGeneric/StdIf/IfxStdIf_Pos.h :
+image.o :	../Libraries/Service/CpuGeneric/StdIf/IfxStdIf.h
+../Libraries/Service/CpuGeneric/StdIf/IfxStdIf.h :
+image.o :	../Libraries/Service/CpuGeneric/StdIf/IfxStdIf_DPipe.h
+../Libraries/Service/CpuGeneric/StdIf/IfxStdIf_DPipe.h :
