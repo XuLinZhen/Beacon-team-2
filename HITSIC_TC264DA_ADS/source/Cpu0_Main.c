@@ -81,6 +81,11 @@ int core0_main(void)
     GPIO_Init(P22,1, PUSHPULL,1);
     GPIO_Init(P22,2, PUSHPULL,1);
     GPIO_Init(P22,3, PUSHPULL,1);
+    /** PWM初始化 */
+    SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, 15000, 0);
+    SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_1_TOUT54_P21_3_OUT, 15000, 0);
+    SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_2_TOUT55_P21_4_OUT, 15000, 0);
+    SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_3_TOUT56_P21_5_OUT, 15000, 0);
     /** 定时中断初始化 */
     Pit_Init(CCU6_0,PIT_CH0,1000*1000);  //电机
     Pit_Init(CCU6_0,PIT_CH1,3000*1000);  //舵机
@@ -91,11 +96,12 @@ int core0_main(void)
     extern const uint8 DISP_image_100thAnniversary[8][128];
     SmartCar_Buffer_Upload((uint8*) DISP_image_100thAnniversary);
     /** ADC */
-    ADC_Init(ADC_1, ADC1_CH4_A20);
+    ADC_Init(ADC_2, ADC2_CH11_A45);
+    ADC_Init(ADC_2, ADC2_CH12_A46);
     /** 初始化摄像头 */
     // SmartCar_MT9V034_Init();
     /** 初始化串口 */
-    SmartCar_Uart_Init(IfxAsclin0_TX_P14_0_OUT,IfxAsclin0_RXA_P14_1_IN,1152000,0);
+    SmartCar_Uart_Init(IfxAsclin0_TX_P14_0_OUT,IfxAsclin0_RXA_P14_1_IN,921600,0);
     /** 初始化菜单 */
     MenuItem_t* MenuRoot = MenuCreate();
     MenuItem_t *currItem = MenuRoot->Child_list;
@@ -127,8 +133,12 @@ while(1)
             delay_runcar = 0;  //延迟发车标志位置为0
             while(1)
             {
+                //SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, 2000);
+                SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_1_TOUT54_P21_3_OUT, 3000);
+                //SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_2_TOUT55_P21_4_OUT, 2000);
+                SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_3_TOUT56_P21_5_OUT, 3000);
                 ssss[0]+=0.1;
-                ssss[1]=ADC_Get(ADC_1, ADC1_CH4_A20, ADC_12BIT);
+                ssss[1]=ADC_Get(ADC_2, ADC2_CH11_A45, ADC_12BIT);
                 SmartCar_VarUpload(ssss,2);
                 currItem = ButtonProcess(GetRoot(currItem), currItem);
                 servo_init(&(c_data[0].servo_pwm));//舵机初始化
