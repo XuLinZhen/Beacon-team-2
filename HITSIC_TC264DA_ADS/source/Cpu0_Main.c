@@ -81,14 +81,16 @@ int core0_main(void)
     GPIO_Init(P22,1, PUSHPULL,1);
     GPIO_Init(P22,2, PUSHPULL,1);
     GPIO_Init(P22,3, PUSHPULL,1);
-    /** ��������ʼ�� */
+    /** 编码器初始化 */
     SmartCar_Encoder_Init(GPT12_T2, IfxGpt120_T2INB_P33_7_IN, IfxGpt120_T2EUDB_P33_6_IN);
     SmartCar_Encoder_Init(GPT12_T6, IfxGpt120_T6INA_P20_3_IN, IfxGpt120_T6EUDA_P20_0_IN);
     /** PWM初始化 */
+    //电机
     SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, 20000, 0);
     SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_1_TOUT54_P21_3_OUT, 20000, 0);
     SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_2_TOUT55_P21_4_OUT, 20000, 0);
     SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_3_TOUT56_P21_5_OUT, 20000, 0);
+    //舵机
     SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM1_1_TOUT31_P33_9_OUT, 50, 0);
     //SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_1_TOUT31_P33_9_OUT, 50, 0);
     /** 定时中断初始化 */
@@ -138,11 +140,11 @@ while(1)
             delay_runcar = 0;  //延迟发车标志位置为0
             while(1)
             {
-                SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, 4000);
+                //SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, 4000);
                 //SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_1_TOUT54_P21_3_OUT, 3000);
-                SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_2_TOUT55_P21_4_OUT, 2000);
+                //SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_2_TOUT55_P21_4_OUT, 2000);
                 //SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_3_TOUT56_P21_5_OUT, 3000);
-                SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM1_1_TOUT31_P33_9_OUT, 751);//680right 820left
+                //SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM1_1_TOUT31_P33_9_OUT, 751);//680right 820left
                 /*ssss[0]+=0.1;
                 ssss[1]=ADC_Get(ADC_2, ADC2_CH11_A45, ADC_12BIT);
                 ssss[2]=ADC_Get(ADC_2, ADC2_CH12_A46, ADC_12BIT);
@@ -255,22 +257,22 @@ void elec_runcar(void)//电磁跑车函数
 }
 void mode_switch(void)//模式切换中断回调函数
 {
-    if(GPIO_Read(P33, 12) == 1 && GPIO_Read(P33, 13) == 1)
+    if(GPIO_Read(P33, 11) == 1 && GPIO_Read(P33, 10) == 1)
     {
         //(*p_mflag) |= 0x01;
         mode_flag=0;
     }
-    else if(GPIO_Read(P33, 12) != 1 && GPIO_Read(P33, 13) == 1)
+    else if(GPIO_Read(P33, 11) != 1 && GPIO_Read(P33, 10) == 1)
     {
         //(*p_mflag) &= 0xfe;
         mode_flag=1;
     }
-    else if(GPIO_Read(P33, 12) == 1 && GPIO_Read(P33, 13) != 1)
+    else if(GPIO_Read(P33, 11) == 1 && GPIO_Read(P33, 10) != 1)
     {
         //(*p_mflag) |= 0x02;
         mode_flag=2;
     }
-    else if(GPIO_Read(P33, 12) != 1 && GPIO_Read(P33, 13) != 1)
+    else if(GPIO_Read(P33, 11) != 1 && GPIO_Read(P33, 10) != 1)
     {
         //(*p_mflag) &= 0xfd;
         mode_flag=3;
@@ -444,30 +446,30 @@ void MenuPrint(MenuItem_t *Menu, MenuItem_t *currItem)  //再加一项当前指�
 int ButtonRead(void)
 {
     int button_operation = 0;
-    if (!GPIO_Read(P22,0))
+    if (!GPIO_Read(P23,1))
     {
         button_operation = up;
-        Delay_ms(STM0, 500);
+        Delay_ms(STM0, 250);
     }
     if (!GPIO_Read(P22,1))
     {
         button_operation = down;
-        Delay_ms(STM0, 500);
+        Delay_ms(STM0, 250);
     }
-    if (!GPIO_Read(P22,2) && GPIO_Read(P22,3))
+    if (!GPIO_Read(P22,2))
     {
         button_operation = left;
-        Delay_ms(STM0, 500);
+        Delay_ms(STM0, 250);
     }
-    if (!GPIO_Read(P22,3) && GPIO_Read(P22,2))
+    if (!GPIO_Read(P22,3))
     {
         button_operation = right;
-        Delay_ms(STM0, 500);
+        Delay_ms(STM0, 250);
     }
-    if (!GPIO_Read(P22,3) && !GPIO_Read(P22,2))
+    if (!GPIO_Read(P22,0))
     {
         button_operation = OK;
-        Delay_ms(STM0, 500);
+        Delay_ms(STM0, 250);
     }
     return button_operation;
 }
@@ -632,7 +634,15 @@ void ItemPrint(MenuItem_t *currItem, int32 pos, int32 *data_array, int32 length)
     }
     else
     {
-        SmartCar_OLED_Printf6x8(42 + (pos-1)*6, 4, "^");
+        if (pos <= (max_digit-4))
+           {
+               SmartCar_OLED_Printf6x8(42 + (pos-1)*6, 4, "^");
+           }
+           else if (pos > (max_digit-4))
+           {
+               SmartCar_OLED_Printf6x8(42 + (pos)*6, 4, "^");
+           }
+        //SmartCar_OLED_Printf6x8(42 + (pos-1)*6, 4, "^");
     }
     int Item_dataint = ArrayToDataint(data_array, max_digit);
     /*switch (currItem->ID)
@@ -785,10 +795,10 @@ void Date_Read(uint32 sector_num)
     CAR[17].datafloat=Page_Read(sector_num,2,float);
     CAR[5].datafloat=Page_Read(sector_num,3,float);
     CAR[8].datafloat=Page_Read(sector_num,4,float);
-    CAR[3].datafloat=Page_Read(sector_num,5,float);
-    CAR[9].datafloat=Page_Read(sector_num,6,float);
-    CAR[10].datafloat=Page_Read(sector_num,7,float);
-    CAR[13].datafloat=Page_Read(sector_num,8,int);
+    //CAR[3].datafloat=Page_Read(sector_num,5,float);
+    CAR[9].datafloat=Page_Read(sector_num,5,float);
+    CAR[10].datafloat=Page_Read(sector_num,6,float);
+    CAR[13].dataint=Page_Read(sector_num,7,int);
 }
 void Date_Write(uint32 sector_num)
 {

@@ -94,6 +94,8 @@ Cpu0_Main.o :	../Libraries/Service/CpuGeneric/_Utilities/Ifx_Assert.h
 ../Libraries/Service/CpuGeneric/_Utilities/Ifx_Assert.h :
 Cpu0_Main.o :	../SmartCar/common.h
 ../SmartCar/common.h :
+Cpu0_Main.o :	../SmartCar/SmartCar_Pwm.h
+../SmartCar/SmartCar_Pwm.h :
 Cpu0_Main.o :	../source/team_elec.h
 ../source/team_elec.h :
 Cpu0_Main.o :	../source/image.h
