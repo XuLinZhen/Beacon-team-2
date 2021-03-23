@@ -10,6 +10,10 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
 SmartCar_PIT.o :	../SmartCar/SmartCar_PIT.c
 ../SmartCar/SmartCar_PIT.c :
 SmartCar_PIT.o :	../SmartCar/SmartCar_PIT.h

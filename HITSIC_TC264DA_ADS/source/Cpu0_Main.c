@@ -94,9 +94,9 @@ int core0_main(void)
     SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM1_1_TOUT31_P33_9_OUT, 50, 0);
     //SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_1_TOUT31_P33_9_OUT, 50, 0);
     /** 定时中断初始化 */
-    Pit_Init(CCU6_0,PIT_CH0,1000*1000);  //电机
-    Pit_Init(CCU6_0,PIT_CH1,3000*1000);  //舵机
-    Pit_Init(CCU6_1,PIT_CH0,7000*1000);  //状态切换
+    Pit_Init(CCU6_0,PIT_CH0,1000);//*1000);  //电机
+    Pit_Init(CCU6_0,PIT_CH1,3000);//*1000);  //舵机
+    Pit_Init(CCU6_1,PIT_CH0,7000);//*1000);  //状态切换
     //Pit_Init(CCU6_1,PIT_CH1,1*1000);  //待定
     /** 初始化OLED屏幕  */
     SmartCar_Oled_Init();
@@ -154,8 +154,10 @@ while(1)
                 currItem = ButtonProcess(GetRoot(currItem), currItem);
                 servo_init(&(c_data[0].servo_pwm));//舵机初始化
                 Motorsp_Init();    //电机速度初始化
+                SmartCar_VarUpload(&wifidata[0],12);//WiFi上传数据
                 //如果标志位发生改变则打断循环
                 if(mode_flag != 0x00) break;
+
             }
         }
         break;
@@ -192,6 +194,7 @@ while(1)
                /* 传图 */
                //SmartCar_ImgUpload((uint8*) mt9v034_image, 120, 188);
                /********/
+               SmartCar_VarUpload(&wifidata[0],12);//WiFi上传数据
                if(mode_flag != 0x02) break;
                }
             banmaxian_flag = 0;//斑马线识别标志位
