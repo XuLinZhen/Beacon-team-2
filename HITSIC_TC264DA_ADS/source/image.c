@@ -15,6 +15,9 @@ int flag=-1;
 int light_flag[10]={0};
 int number=0;
 int sum=0;
+int speed_add_flag=0;
+int speed_reduce_flag=0;
+uint32 speed_judge_light=0;
 //每个白条子属性
 typedef struct {
     uint8   left;//左边界
@@ -492,6 +495,8 @@ void image_main()
             centre_h=0;
             centre_l=188;
         }
+        speed_add_flag=0;
+        speed_reduce_flag=0;    //减加速标志位清零
     }
     else if (sum<-5 &&light_flag[9]==1)
     {
@@ -502,20 +507,42 @@ void image_main()
             light_flag[j]=0;
         }
     }
-
 }
 float get_error(void)
 {
+
     int id=0;
     int a=0;
     int tr=distance_LIGHT_true(centre_l,centre_h);
-    if(tr>=30)
+    if(centre_h<=20)
     {
-        if(centre_l>94) a=centre_l-94;
+        speed_add_flag++;
+        if(speed_add_flag==1) speed_judge_light=c_data[0].Motorspeed[0];
+        c_data[0].Motorspeed[0]=speed_judge_light;
+        if(speed_add_flag>1)
+        {
+            speed_judge_light=c_data[0].Motorspeed[0];
+        }
+        else
+        {
+            speed_judge_light+=2;
+        }
+        if(centre_l>94) a=94-centre_l;
         else a=94-centre_l;
     }
     else
     {
+        speed_reduce_flag++;
+        if(speed_reduce_flag==1) speed_judge_light=c_data[0].Motorspeed[0];
+        c_data[0].Motorspeed[0]=speed_judge_light;
+        if(speed_reduce_flag>1)
+        {
+            speed_judge_light=c_data[0].Motorspeed[0];
+        }
+        else
+        {
+            speed_judge_light-=2;
+        }
         if(centre_l>94)
             {
                 id=distance_LIGHT_ideal_right(centre_l-94,centre_h);

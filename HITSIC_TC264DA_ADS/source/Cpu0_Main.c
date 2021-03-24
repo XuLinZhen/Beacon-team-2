@@ -95,9 +95,9 @@ int core0_main(void)
     //SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_1_TOUT31_P33_9_OUT, 50, 0);
     /** 定时中断初始化 */
     Pit_Init(CCU6_0,PIT_CH0,5*1000);  //电机
-    //Pit_Init(CCU6_0,PIT_CH1,30*1000);  //舵机
+    //Pit_Init(CCU6_0,PIT_CH1,30*1000);  //待定
     Pit_Init(CCU6_1,PIT_CH0,20*1000);  //状态切换
-    Pit_Init(CCU6_1,PIT_CH1,20*1000);  //待定
+    Pit_Init(CCU6_1,PIT_CH1,20*1000);  //舵机
     /** 初始化OLED屏幕  */
     SmartCar_Oled_Init();
     extern const uint8 DISP_image_100thAnniversary[8][128];
@@ -197,9 +197,8 @@ while(1)
                /* 传图 */
                //SmartCar_ImgUpload((uint8*) mt9v034_image, 120, 188);
                /********/
-
                CAR[17].datafloat=(float)GetTime_ms(STM0);
-               SmartCar_OLED_Printf6x8(100, 0, "%f",CAR[17].datafloat);
+               SmartCar_OLED_Printf6x8(100, 0, "%d",CAR[17].datafloat);
                SmartCar_VarUpload(&wifidata[0],1);//WiFi上传数据
                if(mode_flag != 0x02) break;
                }
