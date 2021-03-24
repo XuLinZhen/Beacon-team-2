@@ -94,7 +94,7 @@ int core0_main(void)
     SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM1_1_TOUT31_P33_9_OUT, 50, 0);
     //SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_1_TOUT31_P33_9_OUT, 50, 0);
     /** 定时中断初始化 */
-    Pit_Init(CCU6_0,PIT_CH0,20*1000);  //电机
+    Pit_Init(CCU6_0,PIT_CH0,5*1000);  //电机
     //Pit_Init(CCU6_0,PIT_CH1,30*1000);  //舵机
     Pit_Init(CCU6_1,PIT_CH0,20*1000);  //状态切换
     Pit_Init(CCU6_1,PIT_CH1,20*1000);  //待定
@@ -183,6 +183,7 @@ while(1)
             //p = pitMgr_t::insert(5000U, 1U, Delay_car, pitMgr_t::enable);//延时发车，测试删除定时器中断
             while(1)
                {
+                Systick_Start(STM0);
                //if(delay_runcar==1) pitMgr_t::remove(*p);//测试不再延迟发车，清除定时器中断
                prem_flag = mode_flag;
                //摄像头跑车程序内容
@@ -196,7 +197,10 @@ while(1)
                /* 传图 */
                //SmartCar_ImgUpload((uint8*) mt9v034_image, 120, 188);
                /********/
-               SmartCar_VarUpload(&wifidata[0],12);//WiFi上传数据
+
+               CAR[17].datafloat=(float)GetTime_ms(STM0);
+               SmartCar_OLED_Printf6x8(100, 0, "%f",CAR[17].datafloat);
+               SmartCar_VarUpload(&wifidata[0],1);//WiFi上传数据
                if(mode_flag != 0x02) break;
                }
             banmaxian_flag = 0;//斑马线识别标志位
