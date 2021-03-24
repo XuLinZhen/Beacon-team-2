@@ -47,8 +47,8 @@
 #include "SmartCar_ADC.h"
 
 #pragma section all "cpu0_dsram"
-//IfxCpu_syncEvent g_cpuSyncEvent;
 
+//IfxCpu_syncEvent g_cpuSyncEvent;
 int32 Item_ID = 1;
 Car_data CAR[Max_Item_Amount];
 uint8 *buff;
@@ -94,10 +94,10 @@ int core0_main(void)
     SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM1_1_TOUT31_P33_9_OUT, 50, 0);
     //SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_1_TOUT31_P33_9_OUT, 50, 0);
     /** 定时中断初始化 */
-    Pit_Init(CCU6_0,PIT_CH0,1000);//*1000);  //电机
-    Pit_Init(CCU6_0,PIT_CH1,3000);//*1000);  //舵机
-    Pit_Init(CCU6_1,PIT_CH0,7000);//*1000);  //状态切换
-    //Pit_Init(CCU6_1,PIT_CH1,1*1000);  //待定
+    Pit_Init(CCU6_0,PIT_CH0,20*1000);  //电机
+    //Pit_Init(CCU6_0,PIT_CH1,30*1000);  //舵机
+    Pit_Init(CCU6_1,PIT_CH0,20*1000);  //状态切换
+    Pit_Init(CCU6_1,PIT_CH1,20*1000);  //待定
     /** 初始化OLED屏幕  */
     SmartCar_Oled_Init();
     extern const uint8 DISP_image_100thAnniversary[8][128];
@@ -120,8 +120,8 @@ int core0_main(void)
     //初始化外设
     Date_Read(0);
     CAR[0].dataint++; //启动次数计数器
-    c_data[0].M_Kp=CAR[3].datafloat;
-    c_data[0].M_Ki=CAR[4].datafloat;
+    ctrl_pwm.kp=CAR[3].datafloat;
+    ctrl_pwm.ki=CAR[4].datafloat;
     c_data[0].Motorspeed[0]=CAR[17].datafloat;
     mora_flag=CAR[5].datafloat;
     c_data[0].Kp=CAR[8].datafloat;
@@ -176,7 +176,9 @@ while(1)
             SmartCar_OLED_Fill(0);
             SmartCar_MT9V034_Init();
             Motorsp_Init();//电机速度初始化
-            servo_init(&(c_data[0].servo_pwm));//舵机初始化
+            float ser=6.8;
+            servo_init(&(ser));//舵机初始化
+            //servo_init(&(c_data[0].servo_pwm));//舵机初始化
             delay_runcar = 0;   //延时发车标志位置0
             //p = pitMgr_t::insert(5000U, 1U, Delay_car, pitMgr_t::enable);//延时发车，测试删除定时器中断
             while(1)
@@ -228,12 +230,12 @@ IFX_INTERRUPT(cc60_pit_ch0_isr, 0, CCU6_0_CH0_ISR_PRIORITY)
 }
 
 //舵机
-IFX_INTERRUPT(cc60_pit_ch1_isr, 0, CCU6_0_CH1_ISR_PRIORITY)
+/*IFX_INTERRUPT(cc60_pit_ch1_isr, 0, CCU6_0_CH1_ISR_PRIORITY)
 {
     enableInterrupts();//开启中断嵌套
     servo();
     PIT_CLEAR_FLAG(CCU6_0, PIT_CH1);
-}
+}*/
 //状态切换
 IFX_INTERRUPT(cc61_pit_ch0_isr, 0, CCU6_1_CH0_ISR_PRIORITY)
 {
@@ -242,18 +244,13 @@ IFX_INTERRUPT(cc61_pit_ch0_isr, 0, CCU6_1_CH0_ISR_PRIORITY)
     PIT_CLEAR_FLAG(CCU6_1, PIT_CH0);
 }
 //待定
-/*IFX_INTERRUPT(cc61_pit_ch1_isr, 0, CCU6_1_CH1_ISR_PRIORITY)
+IFX_INTERRUPT(cc61_pit_ch1_isr, 0, CCU6_1_CH1_ISR_PRIORITY)
 {
     enableInterrupts();//开启中断嵌套
-    //while (!mt9v034_finish_flag){}
-    if(mt9v034_finish_flag==1)
-    {
-        mt9v034_finish_flag = 0;
-    }
-
+    servo();
     PIT_CLEAR_FLAG(CCU6_1, PIT_CH1);
 
-}*/
+}
 void elec_runcar(void)//电磁跑车函数
 {
     servo_pid();
@@ -504,8 +501,8 @@ MenuItem_t *ButtonProcess(MenuItem_t *Menu, MenuItem_t* currItem)
                 //memcpy(&buff[0], CAR, sizeof(Car_data) * Max_Item_Amount);
                 Date_Write(0);
                 MenuPrint(Menu, currItem);
-                c_data[0].M_Kp=CAR[3].datafloat;
-                c_data[0].M_Ki=CAR[4].datafloat;
+                ctrl_pwm.kp=CAR[3].datafloat;
+                ctrl_pwm.ki=CAR[4].datafloat;
                 c_data[0].Motorspeed[0]=CAR[17].datafloat;
                 mora_flag=CAR[5].datafloat;
                 c_data[0].Kp=CAR[8].datafloat;

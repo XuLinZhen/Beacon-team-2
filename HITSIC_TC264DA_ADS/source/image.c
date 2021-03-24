@@ -509,15 +509,23 @@ float get_error(void)
     int id=0;
     int a=0;
     int tr=distance_LIGHT_true(centre_l,centre_h);
-    if(centre_l>94)
+    if(tr>=30)
     {
-        id=distance_LIGHT_ideal_right(centre_l-94,centre_h);
-        a=tr-id;
+        if(centre_l>94) a=centre_l-94;
+        else a=94-centre_l;
     }
     else
     {
-        id=distance_LIGHT_ideal_left(centre_l-94,centre_h);
-        a=id-tr;
+        if(centre_l>94)
+            {
+                id=distance_LIGHT_ideal_right(centre_l-94,centre_h);
+                a=tr-id;
+            }
+            else
+            {
+                id=distance_LIGHT_ideal_left(centre_l-94,centre_h);
+                a=id-tr;
+            }
     }
 
     wifidata[7]=id;

@@ -96,12 +96,12 @@ Cpu0_Main.o :	../SmartCar/common.h
 ../SmartCar/common.h :
 Cpu0_Main.o :	../SmartCar/SmartCar_Pwm.h
 ../SmartCar/SmartCar_Pwm.h :
+Cpu0_Main.o :	../source/my_math.h
+../source/my_math.h :
 Cpu0_Main.o :	../source/team_elec.h
 ../source/team_elec.h :
 Cpu0_Main.o :	../source/image.h
 ../source/image.h :
-Cpu0_Main.o :	../source/my_math.h
-../source/my_math.h :
 Cpu0_Main.o :	../source/menu.h
 ../source/menu.h :
 Cpu0_Main.o :	../SmartCar/SmartCar_Flash.h

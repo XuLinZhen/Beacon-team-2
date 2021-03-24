@@ -15,6 +15,7 @@
 #include "math.h"
 #include "SmartCar_Encoder.h"
 #include "SmartCar_Pwm.h"
+#include "my_math.h"
 //#include"sc_host.h"
 
 extern float error_n;//偏差值，定义为全局变量，为了在菜单显示
@@ -27,6 +28,15 @@ extern float M_left_drs;    //左电机理想速度
 extern float M_right_pwm;
 extern float wifidata[20];
 extern float da[8];
+
+typedef struct pidCtrl_t
+{
+    float kp, ki, kd;
+    float errCurr, errIntg, errDiff, errPrev;
+}pidCtrl_t;
+
+extern pidCtrl_t ctrl_pwm;
+
 
 typedef struct _cardata{
     int32 Motorspeed[3] ;//= {22,0,150};
@@ -106,5 +116,43 @@ void Speed_radio(float x);
 *  Sample usage:                 Delay_car();
 **********************************************************************************************************************/
 void Delay_car();
+/**
+ * @brief 计算PID总输出
+ *
+ * @param _pid  PID参数结构体指针
+ * @return float PID结果输出
+ */
+float PIDCTRL_CalcPIDGain(pidCtrl_t *_pid);
+/**
+ * @brief 更新PID偏差，已知偏差项
+ *
+ * @param _pid  PID参数结构体指针
+ * @param _err  偏差
+ */
+void PIDCTRL_ErrUpdate(pidCtrl_t *_pid, float _err);
+/**
+ * @brief 计算比例输出
+ *
+ * @param _pid  PID参数结构体指针
+ * @return float 比例结果输出
+ */
+float PIDCTRL_CalcPGain(pidCtrl_t *_pid);
+
+/**
+ * @brief 计算积分输出
+ *
+ * @param _pid  PID参数结构体指针
+ * @return float 积分结果输出
+ */
+float PIDCTRL_CalcIGain(pidCtrl_t *_pid);
+
+/**
+ * @brief 计算微分输出
+ *
+ * @param _pid  PID参数结构体指针
+ * @return float 微分结果输出
+ */
+float PIDCTRL_CalcDGain(pidCtrl_t *_pid);
+
 
 #endif /* SOURCE_TEAM_CTR_H_ */
