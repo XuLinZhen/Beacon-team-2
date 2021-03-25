@@ -2,6 +2,14 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
 image.o :	../source/image.c
 ../source/image.c :
 image.o :	../source/image.h
@@ -40,3 +48,5 @@ image.o :	../SmartCar/common.h
 ../SmartCar/common.h :
 image.o :	../SmartCar/SmartCar_Pwm.h
 ../SmartCar/SmartCar_Pwm.h :
+image.o :	../source/image.h
+../source/image.h :

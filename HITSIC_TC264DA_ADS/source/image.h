@@ -44,6 +44,8 @@ extern int foresight;
 extern uint8 banmaxian_flag;
 extern uint8 out_flag;
 extern int zebra;
+extern uint8 centre_h;
+extern uint8 centre_l;
 
 void head_clear(void);
 void THRE(void);

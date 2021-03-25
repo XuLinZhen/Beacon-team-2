@@ -483,7 +483,7 @@ void image_main()
         centre_h=centre_h_pre;
         centre_l=centre_l_pre;
     }
-    else if(sum<-5 )  //已切灯，寻找下一个
+    else if(sum<-3 )  //已切灯，寻找下一个
     {
         if(centre_l<94) //左切,舵机左打满
         {
@@ -495,10 +495,9 @@ void image_main()
             centre_h=0;
             centre_l=188;
         }
-        speed_add_flag=0;
-        speed_reduce_flag=0;    //减加速标志位清零
+    //减加速标志位清零
     }
-    else if (sum<-5 &&light_flag[9]==1)
+    else if (sum<-3 &&light_flag[9]==1)
     {
         sum=0;
         light_flag[0]=1;
@@ -506,6 +505,8 @@ void image_main()
         {
             light_flag[j]=0;
         }
+        /*speed_add_flag=0;
+        speed_reduce_flag=0;*/
     }
 }
 float get_error(void)
@@ -514,7 +515,7 @@ float get_error(void)
     int id=0;
     int a=0;
     int tr=distance_LIGHT_true(centre_l,centre_h);
-    if(centre_h<=20)
+   /* if(centre_h<=20)
     {
         speed_add_flag++;
         if(speed_add_flag==1) speed_judge_light=c_data[0].Motorspeed[0];
@@ -530,6 +531,8 @@ float get_error(void)
         if(centre_l>94) a=94-centre_l;
         else a=94-centre_l;
     }
+    if(centre_l>94) a=94-centre_l;
+            else a=94-centre_l;
     else
     {
         speed_reduce_flag++;
@@ -553,8 +556,25 @@ float get_error(void)
                 id=distance_LIGHT_ideal_left(centre_l-94,centre_h);
                 a=id-tr;
             }
-    }
-
+    }*/
+if(centre_h<=20)
+{
+    if(centre_l>94) a=94-centre_l;
+    else a=94-centre_l;
+}
+else
+{
+    if(centre_l>94)
+        {
+            id=distance_LIGHT_ideal_right(centre_l-94,centre_h);
+            a=tr-id;
+        }
+        else
+        {
+            id=distance_LIGHT_ideal_left(centre_l-94,centre_h);
+            a=id-tr;
+        }
+}
     wifidata[7]=id;
     wifidata[8]=tr;
 

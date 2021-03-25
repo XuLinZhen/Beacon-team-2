@@ -16,6 +16,7 @@
 #include "SmartCar_Encoder.h"
 #include "SmartCar_Pwm.h"
 #include "my_math.h"
+#include "image.h"
 //#include"sc_host.h"
 
 extern float error_n;//偏差值，定义为全局变量，为了在菜单显示

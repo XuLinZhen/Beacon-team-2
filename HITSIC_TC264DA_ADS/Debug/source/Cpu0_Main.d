@@ -2,14 +2,6 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
-################################################################################
-# Automatically-generated file. Do not edit!
-################################################################################
-
-################################################################################
-# Automatically-generated file. Do not edit!
-################################################################################
-
 Cpu0_Main.o :	../source/Cpu0_Main.c
 ../source/Cpu0_Main.c :
 Cpu0_Main.o :	../Configurations/Ifx_Cfg.h
@@ -106,6 +98,8 @@ Cpu0_Main.o :	../SmartCar/SmartCar_Pwm.h
 ../SmartCar/SmartCar_Pwm.h :
 Cpu0_Main.o :	../source/my_math.h
 ../source/my_math.h :
+Cpu0_Main.o :	../source/image.h
+../source/image.h :
 Cpu0_Main.o :	../source/team_elec.h
 ../source/team_elec.h :
 Cpu0_Main.o :	../source/image.h

@@ -54,6 +54,7 @@ Car_data CAR[Max_Item_Amount];
 uint8 *buff;
 uint8 Error;
 float ssss[2]={0};
+float time=0;
 int mode_flag = 0;//状态切换标志位变量
 int *p_mflag = NULL;//状态切换指针
 int prem_flag = 0;//状态切换标志位变量2，previous标志位
@@ -128,6 +129,7 @@ int core0_main(void)
     c_data[0].Kd=CAR[9].datafloat;
     c_data[0].servo_mid=CAR[10].datafloat;
     threshold=CAR[13].dataint;
+    c_data[1].Motorspeed[0]=CAR[18].datafloat;
 while(1)
 {
     switch(mode_flag)//菜单模式
@@ -154,6 +156,13 @@ while(1)
                 currItem = ButtonProcess(GetRoot(currItem), currItem);
                 servo_init(&(c_data[0].servo_pwm));//舵机初始化
                 Motorsp_Init();    //电机速度初始化
+                /*ssss[0]++;
+                if(ssss[0]/15==0)
+                {
+                    M_left_drs=25;
+                }
+                else
+                    M_left_drs=10;*/
                 SmartCar_VarUpload(&wifidata[0],12);//WiFi上传数据
                 //如果标志位发生改变则打断循环
                 if(mode_flag != 0x00) break;
@@ -165,6 +174,8 @@ while(1)
         {
           while(1)
           {
+              SmartCar_Show_IMG((uint8*) mt9v034_image, 120, 188);
+              SmartCar_OLED_Printf6x8(95, 0, "%3.3f",time);
               //如果标志位发生改变则打断循环
               if(mode_flag != 0x01) break;
           }
@@ -193,13 +204,12 @@ while(1)
                image_main();
                servo_pid();
                Speed_radio((c_data[0].servo_pwm-c_data[0].servo_mid));
-               SmartCar_Show_IMG((uint8*) mt9v034_image, 120, 188);
+               //SmartCar_Show_IMG((uint8*) mt9v034_image, 120, 188);
                /* 传图 */
                //SmartCar_ImgUpload((uint8*) mt9v034_image, 120, 188);
                /********/
-               CAR[17].datafloat=(float)GetTime_ms(STM0);
-               SmartCar_OLED_Printf6x8(100, 0, "%d",CAR[17].datafloat);
-               SmartCar_VarUpload(&wifidata[0],1);//WiFi上传数据
+               time=GetTime_ms(STM0);
+               SmartCar_VarUpload(&wifidata[0],12);//WiFi上传数据
                if(mode_flag != 0x02) break;
                }
             banmaxian_flag = 0;//斑马线识别标志位
@@ -376,13 +386,16 @@ MenuItem_t *MenuCreate(void)
     {
         MenuItem_Insert(SAVE, ItemCreate("Back", listType, 1, 20));
     }
-    MenuItem_t* Motor_Speed = ItemCreate("M_Speed", floatType, 0, 100);
-    Motor_Speed->Item_data->datafloat=c_data[0].Motorspeed[0];
+    MenuItem_t* Motor_Speed_zx = ItemCreate("M_Speed_zx", floatType, 0, 100);
+    MenuItem_t* Motor_Speed_qd = ItemCreate("M_Speed_qd", floatType, 0, 100);
+    Motor_Speed_zx->Item_data->datafloat=c_data[0].Motorspeed[0];
+    Motor_Speed_qd->Item_data->datafloat=c_data[1].Motorspeed[0];
     MenuItem_Insert(MenuRoot, ItemCreate("*******", listType, 0, 20));
     MenuItem_Insert(MenuRoot, Motor);
     MenuItem_Insert(MenuRoot, Servo);
     MenuItem_Insert(MenuRoot, Camera);
-    MenuItem_Insert(MenuRoot, Motor_Speed);
+    MenuItem_Insert(MenuRoot, Motor_Speed_zx);
+    MenuItem_Insert(MenuRoot, Motor_Speed_qd);
     MenuItem_Insert(MenuRoot, SAVE);
     return MenuRoot;
 }
@@ -491,7 +504,7 @@ MenuItem_t *ButtonProcess(MenuItem_t *Menu, MenuItem_t* currItem)
             break;
         case OK:
 
-            if  (currItem->list_ID==6)
+            if  (currItem->list_ID==7)
             {
                 /*da[0]=c_data[0].M_Kp;
                 da[1]=c_data[0].M_Ki;
@@ -512,6 +525,7 @@ MenuItem_t *ButtonProcess(MenuItem_t *Menu, MenuItem_t* currItem)
                 c_data[0].Kd=CAR[9].datafloat;
                 c_data[0].servo_mid=CAR[10].datafloat;
                 threshold=CAR[13].dataint;
+                c_data[1].Motorspeed[0]=CAR[18].datafloat;
 
             }
             else if (currItem->Item_type == listType)
@@ -798,15 +812,15 @@ void Date_Read(uint32 sector_num)
     CAR[17].datafloat=Page_Read(sector_num,2,float);
     CAR[5].datafloat=Page_Read(sector_num,3,float);
     CAR[8].datafloat=Page_Read(sector_num,4,float);
-    //CAR[3].datafloat=Page_Read(sector_num,5,float);
     CAR[9].datafloat=Page_Read(sector_num,5,float);
     CAR[10].datafloat=Page_Read(sector_num,6,float);
     CAR[13].dataint=Page_Read(sector_num,7,int);
+    CAR[18].datafloat=Page_Read(sector_num,8,float);
 }
 void Date_Write(uint32 sector_num)
 {
     Sector_Erase(sector_num);
-    uint32 fla[8];
+    uint32 fla[9];
     fla[0]=float_conversion_uint32(CAR[3].datafloat);
     fla[1]=float_conversion_uint32(CAR[4].datafloat);
     fla[2]=float_conversion_uint32(CAR[17].datafloat);
@@ -815,6 +829,7 @@ void Date_Write(uint32 sector_num)
     fla[5]=float_conversion_uint32(CAR[9].datafloat);
     fla[6]=float_conversion_uint32(CAR[10].datafloat);
     fla[7]=float_conversion_uint32(CAR[13].dataint);
+    fla[8]=float_conversion_uint32(CAR[18].datafloat);
     Sector_Program(sector_num,fla);
 }
 
