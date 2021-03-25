@@ -47,19 +47,25 @@
 #include "SmartCar_ADC.h"
 
 #pragma section all "cpu0_dsram"
-
+float Charge_pwm=0;
+pidCtrl_t ctrl_charge =
+{
+    .kp = 1.0f, .ki = 0.4f, .kd = 0.0f,
+    .errCurr = 0.0f, .errIntg = 0.0f, .errDiff = 0.0f, .errPrev = 0.0f,
+};
 //IfxCpu_syncEvent g_cpuSyncEvent;
 int32 Item_ID = 1;
 Car_data CAR[Max_Item_Amount];
 uint8 *buff;
 uint8 Error;
-float ssss[2]={0};
+float ssss[5]={0};
 int mode_flag = 0;//状态切换标志位变量
 int *p_mflag = NULL;//状态切换指针
 int prem_flag = 0;//状态切换标志位变量2，previous标志位
 
 void elec_runcar(void);//电磁跑车函数
 void mode_switch(void);//模式切换中断回调函数
+void Charge_PID(void);
 
 int core0_main(void)
 {
@@ -77,14 +83,16 @@ int core0_main(void)
     IfxCpu_emitEvent(&g_cpuSyncEvent);
     IfxCpu_waitEvent(&g_cpuSyncEvent, 1);
     /** GPIO初始化 */
-    GPIO_Init(P22,0, PUSHPULL,1);
-    GPIO_Init(P22,1, PUSHPULL,1);
+    GPIO_Init(P33,12, PUSHPULL,1);
+    GPIO_Init(P33,13, PUSHPULL,1);
     GPIO_Init(P22,2, PUSHPULL,1);
     GPIO_Init(P22,3, PUSHPULL,1);
     /** 编码器初始化 */
-    SmartCar_Encoder_Init(GPT12_T2, IfxGpt120_T2INB_P33_7_IN, IfxGpt120_T2EUDB_P33_6_IN);
-    SmartCar_Encoder_Init(GPT12_T6, IfxGpt120_T6INA_P20_3_IN, IfxGpt120_T6EUDA_P20_0_IN);
+    //SmartCar_Encoder_Init(GPT12_T2, IfxGpt120_T2INB_P33_7_IN, IfxGpt120_T2EUDB_P33_6_IN);
+    //SmartCar_Encoder_Init(GPT12_T6, IfxGpt120_T6INA_P20_3_IN, IfxGpt120_T6EUDA_P20_0_IN);
     /** PWM初始化 */
+    SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_6_TOUT6_P02_6_OUT, 50, 0); //充电02.6
+    /*
     //电机
     SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, 20000, 0);
     SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_1_TOUT54_P21_3_OUT, 20000, 0);
@@ -93,22 +101,25 @@ int core0_main(void)
     //舵机
     SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM1_1_TOUT31_P33_9_OUT, 50, 0);
     //SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_1_TOUT31_P33_9_OUT, 50, 0);
+     * */
     /** 定时中断初始化 */
     Pit_Init(CCU6_0,PIT_CH0,5*1000);  //电机
+    /*
     //Pit_Init(CCU6_0,PIT_CH1,30*1000);  //待定
     Pit_Init(CCU6_1,PIT_CH0,20*1000);  //状态切换
     Pit_Init(CCU6_1,PIT_CH1,20*1000);  //舵机
+    */
     /** 初始化OLED屏幕  */
     SmartCar_Oled_Init();
     extern const uint8 DISP_image_100thAnniversary[8][128];
     SmartCar_Buffer_Upload((uint8*) DISP_image_100thAnniversary);
     /** ADC */
-    ADC_Init(ADC_2, ADC2_CH11_A45);
-    ADC_Init(ADC_2, ADC2_CH12_A46);
+    ADC_Init(ADC_0, ADC0_CH10_A10);//电压
+    ADC_Init(ADC_0, ADC0_CH11_A11);//电流
     /** 初始化摄像头 */
     // SmartCar_MT9V034_Init();
-    /** 初始化串口 */
-    SmartCar_Uart_Init(IfxAsclin0_TX_P14_0_OUT,IfxAsclin0_RXA_P14_1_IN,921600,0);
+    //** 初始化串口 */
+    //SmartCar_Uart_Init(IfxAsclin2_TX_P10_5_OUT,IfxAsclin2_RXD_P10_6_IN,921600,0);
     /** 初始化菜单 */
     MenuItem_t* MenuRoot = MenuCreate();
     MenuItem_t *currItem = MenuRoot->Child_list;
@@ -120,14 +131,9 @@ int core0_main(void)
     //初始化外设
     Date_Read(0);
     CAR[0].dataint++; //启动次数计数器
-    ctrl_pwm.kp=CAR[3].datafloat;
-    ctrl_pwm.ki=CAR[4].datafloat;
-    c_data[0].Motorspeed[0]=CAR[17].datafloat;
-    mora_flag=CAR[5].datafloat;
-    c_data[0].Kp=CAR[8].datafloat;
-    c_data[0].Kd=CAR[9].datafloat;
-    c_data[0].servo_mid=CAR[10].datafloat;
-    threshold=CAR[13].dataint;
+    ctrl_charge.kp=CAR[1].datafloat;
+    ctrl_charge.ki=CAR[2].datafloat;
+    ctrl_charge.kd=CAR[3].datafloat;
 while(1)
 {
     switch(mode_flag)//菜单模式
@@ -140,22 +146,22 @@ while(1)
             delay_runcar = 0;  //延迟发车标志位置为0
             while(1)
             {
-                //SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, 4000);
-                //SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_1_TOUT54_P21_3_OUT, 3000);
-                //SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_2_TOUT55_P21_4_OUT, 2000);
-                //SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_3_TOUT56_P21_5_OUT, 3000);
-                //SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM1_1_TOUT31_P33_9_OUT, 751);//680right 820left
-                /*ssss[0]+=0.1;
-                ssss[1]=ADC_Get(ADC_2, ADC2_CH11_A45, ADC_12BIT);
-                ssss[2]=ADC_Get(ADC_2, ADC2_CH12_A46, ADC_12BIT);
-                ssss[3]=SmartCar_Encoder_Get(GPT12_T2);
-                ssss[4]=SmartCar_Encoder_Get(GPT12_T6);
-                SmartCar_VarUpload(ssss,5);*/
+                ssss[0]+=0.1;
+                ssss[1]=ADC_Get(ADC_0, ADC0_CH10_A10, ADC_12BIT);//U
+                ssss[2]=ADC_Get(ADC_0, ADC0_CH11_A11, ADC_12BIT);//I
+                ssss[3]=ssss[1]*ssss[2];
+                SmartCar_OLED_Printf6x8(5, 5, "%4.3f",ssss[1]);
+                SmartCar_OLED_Printf6x8(5, 6, "%4.3f",ssss[2]);
+                SmartCar_OLED_Printf6x8(5, 7, "%4.3f",ssss[3]);
+                //ssss[3]=SmartCar_Encoder_Get(GPT12_T2);
+                //ssss[4]=SmartCar_Encoder_Get(GPT12_T6);
+                //SmartCar_VarUpload(ssss,5);
                 currItem = ButtonProcess(GetRoot(currItem), currItem);
-                servo_init(&(c_data[0].servo_pwm));//舵机初始化
-                Motorsp_Init();    //电机速度初始化
-                SmartCar_VarUpload(&wifidata[0],12);//WiFi上传数据
+                //servo_init(&(c_data[0].servo_pwm));//舵机初始化
+                //Motorsp_Init();    //电机速度初始化
+                //SmartCar_VarUpload(&wifidata[0],12);//WiFi上传数据
                 //如果标志位发生改变则打断循环
+
                 if(mode_flag != 0x00) break;
 
             }
@@ -222,13 +228,18 @@ while(1)
 }//while结束
 
 }//main结束
-
+void Charge_PID(void)
+{
+    PIDCTRL_ErrUpdate(&ctrl_charge, ssss[3]-10);
+    Charge_pwm = PIDCTRL_CalcPIDGain(&ctrl_charge);
+}
 //中断服务函数
 //电机
 IFX_INTERRUPT(cc60_pit_ch0_isr, 0, CCU6_0_CH0_ISR_PRIORITY)
 {
     enableInterrupts();//开启中断嵌套
-    Motor_ctr();
+    Charge_PID();
+    SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_6_TOUT6_P02_6_OUT, ssss[3]);
     PIT_CLEAR_FLAG(CCU6_0, PIT_CH0);
 }
 
@@ -260,22 +271,22 @@ void elec_runcar(void)//电磁跑车函数
 }
 void mode_switch(void)//模式切换中断回调函数
 {
-    if(GPIO_Read(P33, 11) == 1 && GPIO_Read(P33, 10) == 1)
+    if(GPIO_Read(P33, 13) == 1 && GPIO_Read(P33, 12) == 1)
     {
         //(*p_mflag) |= 0x01;
         mode_flag=0;
     }
-    else if(GPIO_Read(P33, 11) != 1 && GPIO_Read(P33, 10) == 1)
+    else if(GPIO_Read(P33, 13) != 1 && GPIO_Read(P33, 12) == 1)
     {
         //(*p_mflag) &= 0xfe;
         mode_flag=1;
     }
-    else if(GPIO_Read(P33, 11) == 1 && GPIO_Read(P33, 10) != 1)
+    else if(GPIO_Read(P33, 13) == 1 && GPIO_Read(P33, 12) != 1)
     {
         //(*p_mflag) |= 0x02;
         mode_flag=2;
     }
-    else if(GPIO_Read(P33, 11) != 1 && GPIO_Read(P33, 10) != 1)
+    else if(GPIO_Read(P33, 13) != 1 && GPIO_Read(P33, 12) != 1)
     {
         //(*p_mflag) &= 0xfd;
         mode_flag=3;
@@ -335,55 +346,18 @@ MenuItem_t *MenuCreate(void)
     MenuItem_t* MenuRoot = ItemCreate("Beacon team 2", listType, 1, 20);   //menu为菜单项类型
 
     //MenuItem_t* MenuRoot = ItemCreate("Main Menu", listType, 1, 20);   //menu为菜单项类型
-    MenuItem_t* Motor = ItemCreate("Motor", listType, 0, 10);
-    {
-        MenuItem_t* Motor_Kp = ItemCreate("Motor_Kp", floatType, 0, 100);
-        Motor_Kp->Item_data->datafloat=c_data[0].M_Kp;
-        MenuItem_t* Motor_Ki = ItemCreate("Motor_Ki", floatType, 0, 100);
-        Motor_Ki->Item_data->datafloat=c_data[0].M_Ki;
-        MenuItem_t* Mora_flag = ItemCreate("Mora_flag", floatType, 0, 100);
-        Mora_flag->Item_data->datafloat=mora_flag;
+    MenuItem_t* Charge_Kp = ItemCreate("Charge_Kp", floatType, 0, 100);
+    Charge_Kp->Item_data->datafloat = ctrl_charge.kp;
+    MenuItem_t* Charge_Ki = ItemCreate("Charge_Ki", floatType, 0, 100);
+    Charge_Ki->Item_data->datafloat = ctrl_charge.ki;
+    MenuItem_t* Charge_Kd = ItemCreate("Charge_Kd", floatType, 0, 100);
+    Charge_Kd->Item_data->datafloat = ctrl_charge.kd;
 
-        MenuItem_Insert(Motor, ItemCreate("Back", listType, 1, 20));
-        MenuItem_Insert(Motor, Motor_Kp);
-        MenuItem_Insert(Motor, Motor_Ki);
-        MenuItem_Insert(Motor, Mora_flag);
-    }
-    MenuItem_t* Servo = ItemCreate("Servo", listType, 0, 10);
-    {
+    MenuItem_Insert(MenuRoot, Charge_Kp);
+    MenuItem_Insert(MenuRoot, Charge_Ki);
+    MenuItem_Insert(MenuRoot, Charge_Kd);
+    MenuItem_Insert(MenuRoot, ItemCreate("SAVE", listType, 0, 20));
 
-        MenuItem_t* Servo_Kp = ItemCreate("Servo_Kp", floatType, 0, 100);
-        Servo_Kp->Item_data->datafloat=c_data[0].Kp;
-        MenuItem_t* Servo_Kd = ItemCreate("Servo_Kd", floatType, 0, 100);
-        Servo_Kd->Item_data->datafloat=c_data[0].Kd;
-        MenuItem_t* Servo_Mid = ItemCreate("Servo_Mid", floatType, 0, 20);
-        Servo_Mid->Item_data->datafloat=c_data[0].servo_mid;
-
-        MenuItem_Insert(Servo, ItemCreate("Back", listType, 1, 20));
-        MenuItem_Insert(Servo, Servo_Kp);
-        MenuItem_Insert(Servo, Servo_Kd);
-        MenuItem_Insert(Servo, Servo_Mid);
-    }
-    MenuItem_t* Camera = ItemCreate("Camera", listType, 0, 10);
-    {
-        MenuItem_t* Threshold = ItemCreate("Threshold", intType, 0, 255);
-        Threshold->Item_data->dataint=threshold;
-
-        MenuItem_Insert(Camera, ItemCreate("Back", listType, 1, 20));
-        MenuItem_Insert(Camera, Threshold);
-    }
-    MenuItem_t* SAVE = ItemCreate("SAVE", listType, 0, 20);
-    {
-        MenuItem_Insert(SAVE, ItemCreate("Back", listType, 1, 20));
-    }
-    MenuItem_t* Motor_Speed = ItemCreate("M_Speed", floatType, 0, 100);
-    Motor_Speed->Item_data->datafloat=c_data[0].Motorspeed[0];
-    MenuItem_Insert(MenuRoot, ItemCreate("*******", listType, 0, 20));
-    MenuItem_Insert(MenuRoot, Motor);
-    MenuItem_Insert(MenuRoot, Servo);
-    MenuItem_Insert(MenuRoot, Camera);
-    MenuItem_Insert(MenuRoot, Motor_Speed);
-    MenuItem_Insert(MenuRoot, SAVE);
     return MenuRoot;
 }
 /**
@@ -491,7 +465,7 @@ MenuItem_t *ButtonProcess(MenuItem_t *Menu, MenuItem_t* currItem)
             break;
         case OK:
 
-            if  (currItem->list_ID==6)
+            if  (currItem->list_ID==4)
             {
                 /*da[0]=c_data[0].M_Kp;
                 da[1]=c_data[0].M_Ki;
@@ -504,14 +478,9 @@ MenuItem_t *ButtonProcess(MenuItem_t *Menu, MenuItem_t* currItem)
                 //memcpy(&buff[0], CAR, sizeof(Car_data) * Max_Item_Amount);
                 Date_Write(0);
                 MenuPrint(Menu, currItem);
-                ctrl_pwm.kp=CAR[3].datafloat;
-                ctrl_pwm.ki=CAR[4].datafloat;
-                c_data[0].Motorspeed[0]=CAR[17].datafloat;
-                mora_flag=CAR[5].datafloat;
-                c_data[0].Kp=CAR[8].datafloat;
-                c_data[0].Kd=CAR[9].datafloat;
-                c_data[0].servo_mid=CAR[10].datafloat;
-                threshold=CAR[13].dataint;
+                ctrl_charge.kp=CAR[1].datafloat;
+                ctrl_charge.ki=CAR[2].datafloat;
+                ctrl_charge.kd=CAR[3].datafloat;
 
             }
             else if (currItem->Item_type == listType)
@@ -793,28 +762,17 @@ int32 ArrayToDataint(int32 *data_array, int32 length)
 }
 void Date_Read(uint32 sector_num)
 {
-    CAR[3].datafloat=Page_Read(sector_num,0,float);
-    CAR[4].datafloat=Page_Read(sector_num,1,float);
-    CAR[17].datafloat=Page_Read(sector_num,2,float);
-    CAR[5].datafloat=Page_Read(sector_num,3,float);
-    CAR[8].datafloat=Page_Read(sector_num,4,float);
-    //CAR[3].datafloat=Page_Read(sector_num,5,float);
-    CAR[9].datafloat=Page_Read(sector_num,5,float);
-    CAR[10].datafloat=Page_Read(sector_num,6,float);
-    CAR[13].dataint=Page_Read(sector_num,7,int);
+    CAR[1].datafloat=Page_Read(sector_num,0,float);
+    CAR[2].datafloat=Page_Read(sector_num,1,float);
+    CAR[3].datafloat=Page_Read(sector_num,2,float);
 }
 void Date_Write(uint32 sector_num)
 {
     Sector_Erase(sector_num);
-    uint32 fla[8];
-    fla[0]=float_conversion_uint32(CAR[3].datafloat);
-    fla[1]=float_conversion_uint32(CAR[4].datafloat);
-    fla[2]=float_conversion_uint32(CAR[17].datafloat);
-    fla[3]=float_conversion_uint32(CAR[5].datafloat);
-    fla[4]=float_conversion_uint32(CAR[8].datafloat);
-    fla[5]=float_conversion_uint32(CAR[9].datafloat);
-    fla[6]=float_conversion_uint32(CAR[10].datafloat);
-    fla[7]=float_conversion_uint32(CAR[13].dataint);
+    uint32 fla[3];
+    fla[0]=float_conversion_uint32(CAR[1].datafloat);
+    fla[1]=float_conversion_uint32(CAR[2].datafloat);
+    fla[2]=float_conversion_uint32(CAR[3].datafloat);
     Sector_Program(sector_num,fla);
 }
 
