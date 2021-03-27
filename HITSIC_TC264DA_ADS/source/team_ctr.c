@@ -226,16 +226,16 @@ void Speed_radio(float x)
        if(centre_h<=20)
        {
            if(mora_flag%2==0)
-           (x>0)?(Motorsp_Set(((float)(c_data[1].Motorspeed[0]/fa)),((float)c_data[1].Motorspeed[0]))):(Motorsp_Set((float)(c_data[1].Motorspeed[0]),((float)(c_data[1].Motorspeed[0]/fa))));
+           (x>0)?(Motorsp_Set(((float)(c_data[0].Motorspeed[0]/fa)),((float)c_data[0].Motorspeed[0]))):(Motorsp_Set((float)(c_data[0].Motorspeed[0]),((float)(c_data[0].Motorspeed[0]/fa))));
            else
-           (x>0)?(Motorsp_Set(((float)(c_data[1].Motorspeed[0]*2/(fa+1.0))),((float)(c_data[1].Motorspeed[0]*2*fa/(fa+1.0))))):(Motorsp_Set((float)(c_data[1].Motorspeed[0]*2*fa/(fa+1.0)),((float)(c_data[1].Motorspeed[0]*2/(fa+1.0)))));
+           (x>0)?(Motorsp_Set(((float)(c_data[0].Motorspeed[0]*2/(fa+1.0))),((float)(c_data[0].Motorspeed[0]*2*fa/(fa+1.0))))):(Motorsp_Set((float)(c_data[0].Motorspeed[0]*2*fa/(fa+1.0)),((float)(c_data[0].Motorspeed[0]*2/(fa+1.0)))));
        }
        else
        {
            if(mora_flag%2==0)
-           (x>0)?(Motorsp_Set(((float)(c_data[0].Motorspeed[0]/fa)),((float)c_data[0].Motorspeed[0]))):(Motorsp_Set((float)(c_data[0].Motorspeed[0]),((float)(c_data[0].Motorspeed[0]/fa))));
+           (x>0)?(Motorsp_Set(((float)(c_data[1].Motorspeed[0]/fa)),((float)c_data[1].Motorspeed[0]))):(Motorsp_Set((float)(c_data[1].Motorspeed[0]),((float)(c_data[1].Motorspeed[0]/fa))));
            else
-           (x>0)?(Motorsp_Set(((float)(c_data[0].Motorspeed[0]*2/(fa+1.0))),((float)(c_data[0].Motorspeed[0]*2*fa/(fa+1.0))))):(Motorsp_Set((float)(c_data[0].Motorspeed[0]*2*fa/(fa+1.0)),((float)(c_data[0].Motorspeed[0]*2/(fa+1.0)))));
+           (x>0)?(Motorsp_Set(((float)(c_data[1].Motorspeed[0]*2/(fa+1.0))),((float)(c_data[1].Motorspeed[0]*2*fa/(fa+1.0))))):(Motorsp_Set((float)(c_data[1].Motorspeed[0]*2*fa/(fa+1.0)),((float)(c_data[1].Motorspeed[0]*2/(fa+1.0)))));
        }
 }
 void Delay_car()

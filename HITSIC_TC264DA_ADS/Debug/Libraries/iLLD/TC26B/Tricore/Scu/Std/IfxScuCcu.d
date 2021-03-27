@@ -322,6 +322,14 @@
 # Automatically-generated file. Do not edit!
 ################################################################################
 
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
+
 IfxScuCcu.o :	../Libraries/iLLD/TC26B/Tricore/Scu/Std/IfxScuCcu.c
 ../Libraries/iLLD/TC26B/Tricore/Scu/Std/IfxScuCcu.c :
 IfxScuCcu.o :	../Configurations/Ifx_Cfg.h
