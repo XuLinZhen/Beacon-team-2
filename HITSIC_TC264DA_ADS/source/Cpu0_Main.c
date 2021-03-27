@@ -154,15 +154,15 @@ while(1)
                 ssss[4]=SmartCar_Encoder_Get(GPT12_T6);
                 SmartCar_VarUpload(ssss,5);*/
                 currItem = ButtonProcess(GetRoot(currItem), currItem);
-                servo_init(&(c_data[0].servo_pwm));//舵机初始化
-                Motorsp_Init();    //电机速度初始化
-                /*ssss[0]++;
-                if(ssss[0]/15==0)
+                //servo_init(&(c_data[0].servo_pwm));//舵机初始化
+                //Motorsp_Init();    //电机速度初始化
+                ssss[0]+=0.001;
+                if((1+sin(ssss[0]))/2>0.5)
                 {
-                    M_left_drs=25;
+                    c_data[1].Motorspeed[0]=70;
                 }
                 else
-                    M_left_drs=10;*/
+                    c_data[1].Motorspeed[0]=20;
                 SmartCar_VarUpload(&wifidata[0],12);//WiFi上传数据
                 //如果标志位发生改变则打断循环
                 if(mode_flag != 0x00) break;

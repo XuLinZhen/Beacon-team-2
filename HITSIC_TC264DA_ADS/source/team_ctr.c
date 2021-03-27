@@ -274,7 +274,7 @@ float PIDCTRL_CalcPGain(pidCtrl_t *_pid)
  */
 float PIDCTRL_CalcIGain(pidCtrl_t *_pid)
 {
-    return _pid->errIntg * _pid->ki;
+    return _pid->errIntg * _pid->ki/(10000);
 }
 
 /**
