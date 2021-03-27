@@ -10048,3 +10048,180 @@ java.util.concurrent.RejectedExecutionException: Task java.util.concurrent.Sched
 	at org.eclipse.core.internal.events.AutoBuildJob.doBuild(AutoBuildJob.java:157)
 	at org.eclipse.core.internal.events.AutoBuildJob.run(AutoBuildJob.java:244)
 	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+!SESSION 2021-03-27 16:24:17.063 -----------------------------------------------
+eclipse.buildId=1.3.0
+java.version=11.0.2
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=zh_CN
+Framework arguments:  -perspective com.infineon.aurix.buildmanager.perspective.c
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -perspective com.infineon.aurix.buildmanager.perspective.c
+
+!ENTRY org.eclipse.cdt.dsf.ui 2 0 2021-03-27 16:54:02.297
+!MESSAGE Cannot read source file: E:\SmartCar\Beacons-2\HITSIC_TC264DA_ADS\source/SmartCar_Isr.c
+!STACK 1
+org.eclipse.core.runtime.CoreException: Exception occurred retrieving file contents.
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceFileInfo.initSource(SourceFileInfo.java:74)
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceReadingJob.run(SourceReadingJob.java:68)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+Caused by: java.io.FileNotFoundException: D:\HIT_smartcar\MA_two\HITSIC_TC264DA_ADS\SmartCar_Isr.c (系统找不到指定的文件。)
+	at java.base/java.io.FileInputStream.open0(Native Method)
+	at java.base/java.io.FileInputStream.open(FileInputStream.java:219)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:157)
+	at org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage.getContents(LocalFileStorage.java:60)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.setDocumentContent(StorageDocumentProvider.java:197)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.createDocument(StorageDocumentProvider.java:225)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.createElementInfo(StorageDocumentProvider.java:254)
+	at org.eclipse.ui.texteditor.AbstractDocumentProvider.connect(AbstractDocumentProvider.java:395)
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceFileInfo.initSource(SourceFileInfo.java:70)
+	... 2 more
+!SUBENTRY 1 org.eclipse.debug.core 4 125 2021-03-27 16:54:02.298
+!MESSAGE Exception occurred retrieving file contents.
+!STACK 0
+java.io.FileNotFoundException: D:\HIT_smartcar\MA_two\HITSIC_TC264DA_ADS\SmartCar_Isr.c (系统找不到指定的文件。)
+	at java.base/java.io.FileInputStream.open0(Native Method)
+	at java.base/java.io.FileInputStream.open(FileInputStream.java:219)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:157)
+	at org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage.getContents(LocalFileStorage.java:60)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.setDocumentContent(StorageDocumentProvider.java:197)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.createDocument(StorageDocumentProvider.java:225)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.createElementInfo(StorageDocumentProvider.java:254)
+	at org.eclipse.ui.texteditor.AbstractDocumentProvider.connect(AbstractDocumentProvider.java:395)
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceFileInfo.initSource(SourceFileInfo.java:70)
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceReadingJob.run(SourceReadingJob.java:68)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+
+!ENTRY org.eclipse.cdt.dsf.ui 2 0 2021-03-27 16:54:02.312
+!MESSAGE Cannot read source file: E:\SmartCar\Beacons-2\HITSIC_TC264DA_ADS\Libraries\iLLD\TC26B\Tricore\Cpu\Std\IfxCpu.h
+!STACK 1
+org.eclipse.core.runtime.CoreException: Exception occurred retrieving file contents.
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceFileInfo.initSource(SourceFileInfo.java:74)
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceReadingJob.run(SourceReadingJob.java:68)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+Caused by: java.io.FileNotFoundException: D:\HIT_smartcar\MA_two\HITSIC_TC264DA_ADS\IfxCpu.h (系统找不到指定的文件。)
+	at java.base/java.io.FileInputStream.open0(Native Method)
+	at java.base/java.io.FileInputStream.open(FileInputStream.java:219)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:157)
+	at org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage.getContents(LocalFileStorage.java:60)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.setDocumentContent(StorageDocumentProvider.java:197)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.createDocument(StorageDocumentProvider.java:225)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.createElementInfo(StorageDocumentProvider.java:254)
+	at org.eclipse.ui.texteditor.AbstractDocumentProvider.connect(AbstractDocumentProvider.java:395)
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceFileInfo.initSource(SourceFileInfo.java:70)
+	... 2 more
+!SUBENTRY 1 org.eclipse.debug.core 4 125 2021-03-27 16:54:02.312
+!MESSAGE Exception occurred retrieving file contents.
+!STACK 0
+java.io.FileNotFoundException: D:\HIT_smartcar\MA_two\HITSIC_TC264DA_ADS\IfxCpu.h (系统找不到指定的文件。)
+	at java.base/java.io.FileInputStream.open0(Native Method)
+	at java.base/java.io.FileInputStream.open(FileInputStream.java:219)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:157)
+	at org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage.getContents(LocalFileStorage.java:60)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.setDocumentContent(StorageDocumentProvider.java:197)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.createDocument(StorageDocumentProvider.java:225)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.createElementInfo(StorageDocumentProvider.java:254)
+	at org.eclipse.ui.texteditor.AbstractDocumentProvider.connect(AbstractDocumentProvider.java:395)
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceFileInfo.initSource(SourceFileInfo.java:70)
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceReadingJob.run(SourceReadingJob.java:68)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+
+!ENTRY org.eclipse.cdt.dsf.ui 2 0 2021-03-27 16:59:35.042
+!MESSAGE Cannot read source file: E:\SmartCar\Beacons-2\HITSIC_TC264DA_ADS\Libraries/iLLD/TC26B/Tricore/Cpu/Trap/IfxCpu_Trap.c
+!STACK 1
+org.eclipse.core.runtime.CoreException: Exception occurred retrieving file contents.
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceFileInfo.initSource(SourceFileInfo.java:74)
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceReadingJob.run(SourceReadingJob.java:68)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+Caused by: java.io.FileNotFoundException: D:\HIT_smartcar\MA_two\HITSIC_TC264DA_ADS\IfxCpu_Trap.c (系统找不到指定的文件。)
+	at java.base/java.io.FileInputStream.open0(Native Method)
+	at java.base/java.io.FileInputStream.open(FileInputStream.java:219)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:157)
+	at org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage.getContents(LocalFileStorage.java:60)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.setDocumentContent(StorageDocumentProvider.java:197)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.createDocument(StorageDocumentProvider.java:225)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.createElementInfo(StorageDocumentProvider.java:254)
+	at org.eclipse.ui.texteditor.AbstractDocumentProvider.connect(AbstractDocumentProvider.java:395)
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceFileInfo.initSource(SourceFileInfo.java:70)
+	... 2 more
+!SUBENTRY 1 org.eclipse.debug.core 4 125 2021-03-27 16:59:35.043
+!MESSAGE Exception occurred retrieving file contents.
+!STACK 0
+java.io.FileNotFoundException: D:\HIT_smartcar\MA_two\HITSIC_TC264DA_ADS\IfxCpu_Trap.c (系统找不到指定的文件。)
+	at java.base/java.io.FileInputStream.open0(Native Method)
+	at java.base/java.io.FileInputStream.open(FileInputStream.java:219)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:157)
+	at org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage.getContents(LocalFileStorage.java:60)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.setDocumentContent(StorageDocumentProvider.java:197)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.createDocument(StorageDocumentProvider.java:225)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.createElementInfo(StorageDocumentProvider.java:254)
+	at org.eclipse.ui.texteditor.AbstractDocumentProvider.connect(AbstractDocumentProvider.java:395)
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceFileInfo.initSource(SourceFileInfo.java:70)
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceReadingJob.run(SourceReadingJob.java:68)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+
+!ENTRY org.eclipse.cdt.dsf.ui 2 0 2021-03-27 16:59:35.128
+!MESSAGE Cannot read source file: E:\SmartCar\Beacons-2\HITSIC_TC264DA_ADS\Libraries\iLLD\TC26B\Tricore\Cpu\Std\IfxCpu_IntrinsicsTasking.h
+!STACK 1
+org.eclipse.core.runtime.CoreException: Exception occurred retrieving file contents.
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceFileInfo.initSource(SourceFileInfo.java:74)
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceReadingJob.run(SourceReadingJob.java:68)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+Caused by: java.io.FileNotFoundException: D:\HIT_smartcar\MA_two\HITSIC_TC264DA_ADS\IfxCpu_IntrinsicsTasking.h (系统找不到指定的文件。)
+	at java.base/java.io.FileInputStream.open0(Native Method)
+	at java.base/java.io.FileInputStream.open(FileInputStream.java:219)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:157)
+	at org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage.getContents(LocalFileStorage.java:60)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.setDocumentContent(StorageDocumentProvider.java:197)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.createDocument(StorageDocumentProvider.java:225)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.createElementInfo(StorageDocumentProvider.java:254)
+	at org.eclipse.ui.texteditor.AbstractDocumentProvider.connect(AbstractDocumentProvider.java:395)
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceFileInfo.initSource(SourceFileInfo.java:70)
+	... 2 more
+!SUBENTRY 1 org.eclipse.debug.core 4 125 2021-03-27 16:59:35.128
+!MESSAGE Exception occurred retrieving file contents.
+!STACK 0
+java.io.FileNotFoundException: D:\HIT_smartcar\MA_two\HITSIC_TC264DA_ADS\IfxCpu_IntrinsicsTasking.h (系统找不到指定的文件。)
+	at java.base/java.io.FileInputStream.open0(Native Method)
+	at java.base/java.io.FileInputStream.open(FileInputStream.java:219)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:157)
+	at org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage.getContents(LocalFileStorage.java:60)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.setDocumentContent(StorageDocumentProvider.java:197)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.createDocument(StorageDocumentProvider.java:225)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.createElementInfo(StorageDocumentProvider.java:254)
+	at org.eclipse.ui.texteditor.AbstractDocumentProvider.connect(AbstractDocumentProvider.java:395)
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceFileInfo.initSource(SourceFileInfo.java:70)
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceReadingJob.run(SourceReadingJob.java:68)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+
+!ENTRY org.eclipse.cdt.dsf.ui 2 0 2021-03-27 16:59:35.138
+!MESSAGE Cannot read source file: E:\SmartCar\Beacons-2\HITSIC_TC264DA_ADS\Libraries\iLLD\TC26B\Tricore\Cpu\Std\IfxCpu.h
+!STACK 1
+org.eclipse.core.runtime.CoreException: Exception occurred retrieving file contents.
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceFileInfo.initSource(SourceFileInfo.java:74)
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceReadingJob.run(SourceReadingJob.java:68)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+Caused by: java.io.FileNotFoundException: D:\HIT_smartcar\MA_two\HITSIC_TC264DA_ADS\IfxCpu.h (系统找不到指定的文件。)
+	at java.base/java.io.FileInputStream.open0(Native Method)
+	at java.base/java.io.FileInputStream.open(FileInputStream.java:219)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:157)
+	at org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage.getContents(LocalFileStorage.java:60)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.setDocumentContent(StorageDocumentProvider.java:197)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.createDocument(StorageDocumentProvider.java:225)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.createElementInfo(StorageDocumentProvider.java:254)
+	at org.eclipse.ui.texteditor.AbstractDocumentProvider.connect(AbstractDocumentProvider.java:395)
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceFileInfo.initSource(SourceFileInfo.java:70)
+	... 2 more
+!SUBENTRY 1 org.eclipse.debug.core 4 125 2021-03-27 16:59:35.138
+!MESSAGE Exception occurred retrieving file contents.
+!STACK 0
+java.io.FileNotFoundException: D:\HIT_smartcar\MA_two\HITSIC_TC264DA_ADS\IfxCpu.h (系统找不到指定的文件。)
+	at java.base/java.io.FileInputStream.open0(Native Method)
+	at java.base/java.io.FileInputStream.open(FileInputStream.java:219)
+	at java.base/java.io.FileInputStream.<init>(FileInputStream.java:157)
+	at org.eclipse.debug.core.sourcelookup.containers.LocalFileStorage.getContents(LocalFileStorage.java:60)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.setDocumentContent(StorageDocumentProvider.java:197)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.createDocument(StorageDocumentProvider.java:225)
+	at org.eclipse.ui.editors.text.StorageDocumentProvider.createElementInfo(StorageDocumentProvider.java:254)
+	at org.eclipse.ui.texteditor.AbstractDocumentProvider.connect(AbstractDocumentProvider.java:395)
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceFileInfo.initSource(SourceFileInfo.java:70)
+	at org.eclipse.cdt.dsf.debug.internal.ui.disassembly.model.SourceReadingJob.run(SourceReadingJob.java:68)
+	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)

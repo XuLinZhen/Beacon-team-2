@@ -114,15 +114,15 @@ int core0_main(void)
     MenuItem_t* MenuRoot = MenuCreate();
     MenuItem_t *currItem = MenuRoot->Child_list;
     /*初始化标志位*/
-    delay_runcar = 0;//延迟发车标志位
+    delay_runcar = 1;//延迟发车标志位
     banmaxian_flag = 0;//斑马线识别标志位
     /** 初始化结束，开启总中断 */
     IfxCpu_enableInterrupts();
     //初始化外设
     Date_Read(0);
     CAR[0].dataint++; //启动次数计数器
-    ctrl_pwm.kp=CAR[3].datafloat;
-    ctrl_pwm.ki=CAR[4].datafloat;
+    c_data[0].M_Kp=CAR[3].datafloat;
+    c_data[0].M_Ki=CAR[4].datafloat;
     c_data[0].Motorspeed[0]=CAR[17].datafloat;
     mora_flag=CAR[5].datafloat;
     c_data[0].Kp=CAR[8].datafloat;
@@ -139,7 +139,7 @@ while(1)
 
             MenuPrint(MenuRoot, currItem);                  //构建菜单并打印
             //当标志位为0时:
-            delay_runcar = 0;  //延迟发车标志位置为0
+            //delay_runcar = 1;  //延迟发车标志位置为0
             while(1)
             {
                 //SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, 4000);
@@ -154,16 +154,22 @@ while(1)
                 ssss[4]=SmartCar_Encoder_Get(GPT12_T6);
                 SmartCar_VarUpload(ssss,5);*/
                 currItem = ButtonProcess(GetRoot(currItem), currItem);
-                //servo_init(&(c_data[0].servo_pwm));//舵机初始化
-                //Motorsp_Init();    //电机速度初始化
+                servo_init(&(c_data[0].servo_pwm));//舵机初始化
+                servo_pid();
+                Motorsp_Init();    //电机速度初始化
                 ssss[0]+=0.001;
                 if((1+sin(ssss[0]))/2>0.5)
                 {
+                    c_data[0].Motorspeed[0]=70;
                     c_data[1].Motorspeed[0]=70;
                 }
                 else
+                {
+                    c_data[0].Motorspeed[0]=20;
                     c_data[1].Motorspeed[0]=20;
-                SmartCar_VarUpload(&wifidata[0],12);//WiFi上传数据
+                }
+
+                SmartCar_VarUpload(&wifidata[0],16);//WiFi上传数据
                 //如果标志位发生改变则打断循环
                 if(mode_flag != 0x00) break;
 
@@ -517,8 +523,8 @@ MenuItem_t *ButtonProcess(MenuItem_t *Menu, MenuItem_t* currItem)
                 //memcpy(&buff[0], CAR, sizeof(Car_data) * Max_Item_Amount);
                 Date_Write(0);
                 MenuPrint(Menu, currItem);
-                ctrl_pwm.kp=CAR[3].datafloat;
-                ctrl_pwm.ki=CAR[4].datafloat;
+                c_data[0].M_Kp=CAR[3].datafloat;
+                c_data[0].M_Ki=CAR[4].datafloat;
                 c_data[0].Motorspeed[0]=CAR[17].datafloat;
                 mora_flag=CAR[5].datafloat;
                 c_data[0].Kp=CAR[8].datafloat;
