@@ -63,9 +63,17 @@ int mode_flag = 0;//状态切换标志位变量
 int *p_mflag = NULL;//状态切换指针
 int prem_flag = 0;//状态切换标志位变量2，previous标志位
 
+float charge_err_l = 0;   //充电偏差值
+float charge_err1_l = 0;  //充电前一次偏差值
+
+float charge_pwm = 0;  //充电pwm值
+
+float charge_drs = 0;    //充电理想功率
+
 void elec_runcar(void);//电磁跑车函数
 void mode_switch(void);//模式切换中断回调函数
-void Charge_PID(void);
+void Charge_PID(void);//mark
+void Charge_pid2(void);
 
 int core0_main(void)
 {
@@ -232,6 +240,25 @@ void Charge_PID(void)
 {
     PIDCTRL_ErrUpdate(&ctrl_charge, ssss[3]-10);
     Charge_pwm = PIDCTRL_CalcPIDGain(&ctrl_charge);
+}
+void Charge_pid2(void)
+{
+    float *p_pwm,*p_erro,*p_errolast,*p_drs,*m_pwm;
+        p_erro = &charge_err_l;
+        p_drs = &charge_drs;
+        p_pwm = &charge_pwm;
+        p_errolast = &charge_err1_l;
+        *p_erro = *p_drs-(float)(ssss[1]*ssss[2]);//充电偏差
+        *p_pwm += ctrl_charge.kp*((*p_erro)-(*p_errolast))+ctrl_charge.ki*(*p_erro)+ctrl_charge.kd*(*p_erro-*p_errolast);//充电增量式
+        *p_errolast = *p_erro;//记录上一次偏差
+        /*限幅代码*/
+        if(charge_pwm>50.0) {m_pwm = &charge_pwm;*m_pwm = 50.0;}
+        else if(charge_pwm<-50.0) {m_pwm = &charge_pwm;*m_pwm = -50.0;}
+        else m_pwm = NULL;
+        /*限幅代码*/
+        //p_pwm=p_erro=p_errolast=p_drs=m_pwm=NULL;
+
+
 }
 //中断服务函数
 //电机
