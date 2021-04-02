@@ -24,7 +24,7 @@
 
 void SmartCar_Uart_Upload(uint8* txData, Ifx_SizeT count)
 {
-    SmartCar_Uart_Transfer(txData, count, 0);
+    SmartCar_Uart_Transfer(txData, count, 2);
 }
 
 

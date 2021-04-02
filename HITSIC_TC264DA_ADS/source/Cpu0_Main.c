@@ -68,7 +68,9 @@ float charge_err1_l = 0;  //充电前一次偏差值
 
 float charge_pwm = 0;  //充电pwm值
 
-float charge_drs = 0;    //充电理想功率
+float charge_drs = 10;    //充电理想功率
+float Charge_U = 0;  //充电理想电压
+float TEST_sector=1.0;
 
 void elec_runcar(void);//电磁跑车函数
 void mode_switch(void);//模式切换中断回调函数
@@ -127,7 +129,7 @@ int core0_main(void)
     /** 初始化摄像头 */
     // SmartCar_MT9V034_Init();
     //** 初始化串口 */
-    //SmartCar_Uart_Init(IfxAsclin2_TX_P10_5_OUT,IfxAsclin2_RXD_P10_6_IN,921600,0);
+    SmartCar_Uart_Init(IfxAsclin2_TX_P10_5_OUT,IfxAsclin2_RXD_P10_6_IN,921600,2);
     /** 初始化菜单 */
     MenuItem_t* MenuRoot = MenuCreate();
     MenuItem_t *currItem = MenuRoot->Child_list;
@@ -137,11 +139,13 @@ int core0_main(void)
     /** 初始化结束，开启总中断 */
     IfxCpu_enableInterrupts();
     //初始化外设
-    Date_Read(0);
+    Date_Read(1);
     CAR[0].dataint++; //启动次数计数器
     ctrl_charge.kp=CAR[1].datafloat;
     ctrl_charge.ki=CAR[2].datafloat;
     ctrl_charge.kd=CAR[3].datafloat;
+    Charge_U=CAR[4].datafloat;
+    charge_drs=CAR[5].datafloat;
 while(1)
 {
     switch(mode_flag)//菜单模式
@@ -155,23 +159,36 @@ while(1)
             while(1)
             {
                 ssss[0]+=0.1;
-                ssss[1]=ADC_Get(ADC_0, ADC0_CH10_A10, ADC_12BIT);//U
-                ssss[2]=ADC_Get(ADC_0, ADC0_CH11_A11, ADC_12BIT);//I
+                ssss[1]=ADC_Get(ADC_0, ADC0_CH10_A10, ADC_12BIT)*(3.3/4096);//U
+                ssss[2]=ADC_Get(ADC_0, ADC0_CH11_A11, ADC_12BIT)*(3.3/4096)/0.4;//I
                 ssss[3]=ssss[1]*ssss[2];
-                SmartCar_OLED_Printf6x8(5, 5, "%4.3f",ssss[1]);
-                SmartCar_OLED_Printf6x8(5, 6, "%4.3f",ssss[2]);
-                SmartCar_OLED_Printf6x8(5, 7, "%4.3f",ssss[3]);
+
+                wifidata[0]=ssss[0];
+                wifidata[1]=ssss[1];
+                wifidata[2]=ssss[2];
+                wifidata[3]=ssss[3];
+                wifidata[4]=11.287*ssss[1]-0.7624;
+                wifidata[6]=Charge_U;
+                wifidata[7]=charge_drs;
+                wifidata[8]=CAR[1].datafloat;
+                wifidata[9]=CAR[2].datafloat;
+                wifidata[10]=CAR[3].datafloat;
+                wifidata[11]=CAR[4].datafloat;
+                wifidata[12]=CAR[5].datafloat;
+
+
                 //ssss[3]=SmartCar_Encoder_Get(GPT12_T2);
                 //ssss[4]=SmartCar_Encoder_Get(GPT12_T6);
                 //SmartCar_VarUpload(ssss,5);
                 currItem = ButtonProcess(GetRoot(currItem), currItem);
                 //servo_init(&(c_data[0].servo_pwm));//舵机初始化
                 //Motorsp_Init();    //电机速度初始化
-                //SmartCar_VarUpload(&wifidata[0],12);//WiFi上传数据
+
+
+                SmartCar_VarUpload(&wifidata[0],13);//WiFi上传数据
                 //如果标志位发生改变则打断循环
 
                 if(mode_flag != 0x00) break;
-
             }
         }
         break;
@@ -238,8 +255,12 @@ while(1)
 }//main结束
 void Charge_PID(void)
 {
-    PIDCTRL_ErrUpdate(&ctrl_charge, ssss[3]-10);
+    float*m_pwm;
+    PIDCTRL_ErrUpdate(&ctrl_charge, ssss[3]-8);
     Charge_pwm = PIDCTRL_CalcPIDGain(&ctrl_charge);
+    if(Charge_pwm>10000.0) {m_pwm = &Charge_pwm;*m_pwm = 10000.0;}
+    else if(Charge_pwm<0) {m_pwm = &Charge_pwm;*m_pwm = 0;}
+    //SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_6_TOUT6_P02_6_OUT, Charge_pwm);
 }
 void Charge_pid2(void)
 {
@@ -248,13 +269,13 @@ void Charge_pid2(void)
         p_drs = &charge_drs;
         p_pwm = &charge_pwm;
         p_errolast = &charge_err1_l;
-        *p_erro = *p_drs-(float)(ssss[1]*ssss[2]);//充电偏差
-        *p_pwm += ctrl_charge.kp*((*p_erro)-(*p_errolast))+ctrl_charge.ki*(*p_erro)+ctrl_charge.kd*(*p_erro-*p_errolast);//充电增量式
+        *p_erro = *p_drs-(float)((11.287*ssss[1]-0.7624)*ssss[2]);//充电偏差
+        *p_pwm += ctrl_charge.kp*((*p_erro)-(*p_errolast))+ctrl_charge.ki*(*p_erro);//;+ctrl_charge.kd*(*p_erro-*p_errolast);//充电增量式
         *p_errolast = *p_erro;//记录上一次偏差
         /*限幅代码*/
-        if(charge_pwm>50.0) {m_pwm = &charge_pwm;*m_pwm = 50.0;}
-        else if(charge_pwm<-50.0) {m_pwm = &charge_pwm;*m_pwm = -50.0;}
-        else m_pwm = NULL;
+        if(charge_pwm>9999.0) {m_pwm = &charge_pwm;*m_pwm = 9999.0;}
+        else if(charge_pwm<0) {m_pwm = &charge_pwm;*m_pwm = 0;}
+        wifidata[5]=charge_pwm;
         /*限幅代码*/
         //p_pwm=p_erro=p_errolast=p_drs=m_pwm=NULL;
 
@@ -265,8 +286,14 @@ void Charge_pid2(void)
 IFX_INTERRUPT(cc60_pit_ch0_isr, 0, CCU6_0_CH0_ISR_PRIORITY)
 {
     enableInterrupts();//开启中断嵌套
-    Charge_PID();
-    SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_6_TOUT6_P02_6_OUT, ssss[3]);
+    Charge_pid2();
+    if(ssss[1]>((Charge_U+0.7624)/11.287))
+    {
+        charge_pwm=0;
+        wifidata[5]=charge_pwm;
+    }
+    SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_6_TOUT6_P02_6_OUT, charge_pwm);
+
     PIT_CLEAR_FLAG(CCU6_0, PIT_CH0);
 }
 
@@ -379,10 +406,16 @@ MenuItem_t *MenuCreate(void)
     Charge_Ki->Item_data->datafloat = ctrl_charge.ki;
     MenuItem_t* Charge_Kd = ItemCreate("Charge_Kd", floatType, 0, 100);
     Charge_Kd->Item_data->datafloat = ctrl_charge.kd;
+    MenuItem_t* Charge_Voltage = ItemCreate("Charge_U", floatType, 0, 100);
+    Charge_Voltage->Item_data->datafloat = Charge_U;
+    MenuItem_t* Charge_Power = ItemCreate("Charge_P", floatType, 0, 100);
+    Charge_Power->Item_data->datafloat = charge_drs;
 
     MenuItem_Insert(MenuRoot, Charge_Kp);
     MenuItem_Insert(MenuRoot, Charge_Ki);
     MenuItem_Insert(MenuRoot, Charge_Kd);
+    MenuItem_Insert(MenuRoot, Charge_Voltage);
+    MenuItem_Insert(MenuRoot, Charge_Power);
     MenuItem_Insert(MenuRoot, ItemCreate("SAVE", listType, 0, 20));
 
     return MenuRoot;
@@ -492,7 +525,7 @@ MenuItem_t *ButtonProcess(MenuItem_t *Menu, MenuItem_t* currItem)
             break;
         case OK:
 
-            if  (currItem->list_ID==4)
+            if  (currItem->list_ID==6)
             {
                 /*da[0]=c_data[0].M_Kp;
                 da[1]=c_data[0].M_Ki;
@@ -503,11 +536,13 @@ MenuItem_t *ButtonProcess(MenuItem_t *Menu, MenuItem_t* currItem)
                 da[6]=c_data[0].servo_mid;
                 da[7]=threshold;*/
                 //memcpy(&buff[0], CAR, sizeof(Car_data) * Max_Item_Amount);
-                Date_Write(0);
+                Date_Write(1);
                 MenuPrint(Menu, currItem);
                 ctrl_charge.kp=CAR[1].datafloat;
                 ctrl_charge.ki=CAR[2].datafloat;
                 ctrl_charge.kd=CAR[3].datafloat;
+                Charge_U=CAR[4].datafloat;
+                charge_drs=CAR[5].datafloat;
 
             }
             else if (currItem->Item_type == listType)
