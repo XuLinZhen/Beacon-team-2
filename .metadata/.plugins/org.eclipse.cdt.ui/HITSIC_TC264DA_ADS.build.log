@@ -1,13 +1,13 @@
-15:52:46 **** Incremental Build of configuration Debug for project HITSIC_TC264DA_ADS ****
+12:15:23 **** Incremental Build of configuration Debug for project HITSIC_TC264DA_ADS ****
 make --output-sync -j8 all 
-Invoking: Print Size
 TASKING VX-toolset for AURIX Development Studio (non-commercial): ELF size v1.1r4 Build 20052552
+Invoking: Print Size
 elfsize  "HITSIC_TC264DA_ADS.elf"
 Total sizes:
-ROM: 0xd29e (53918) = code: 0xc12a (49450) + romdata: 0x1174 (4468)
-RAM: 0x17c53 (97363) = data + bss
+ROM: 0xd4fa (54522) = code: 0xc32c (49964) + romdata: 0x11ce (4558)
+RAM: 0x17ca7 (97447) = data + bss
 Finished building: HITSIC_TC264DA_ADS.siz
  
 
-15:52:47 Build Finished. 0 errors, 0 warnings. (took 799ms)
+12:15:24 Build Finished. 0 errors, 0 warnings. (took 948ms)
 

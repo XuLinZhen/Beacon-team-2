@@ -71,7 +71,9 @@ float charge_pwm = 0;  //充电pwm值
 float charge_drs = 10;    //充电理想功率
 float Charge_U = 0;  //充电理想电压
 float TEST_sector=1.0;
-
+int charge_num=0;
+float charge_avg_U[10]={0};
+float charge_avg_I[10]={0};
 void elec_runcar(void);//电磁跑车函数
 void mode_switch(void);//模式切换中断回调函数
 void Charge_PID(void);//mark
@@ -141,11 +143,11 @@ int core0_main(void)
     //初始化外设
     Date_Read(1);
     CAR[0].dataint++; //启动次数计数器
-    ctrl_charge.kp=CAR[1].datafloat;
-    ctrl_charge.ki=CAR[2].datafloat;
-    ctrl_charge.kd=CAR[3].datafloat;
-    Charge_U=CAR[4].datafloat;
-    charge_drs=CAR[5].datafloat;
+    ctrl_charge.kp=CAR[2].datafloat;
+    ctrl_charge.ki=CAR[3].datafloat;
+    ctrl_charge.kd=CAR[4].datafloat;
+    Charge_U=CAR[5].datafloat;
+    charge_drs=CAR[6].datafloat;
 while(1)
 {
     switch(mode_flag)//菜单模式
@@ -158,10 +160,28 @@ while(1)
             delay_runcar = 0;  //延迟发车标志位置为0
             while(1)
             {
-                ssss[0]+=0.1;
-                ssss[1]=ADC_Get(ADC_0, ADC0_CH10_A10, ADC_12BIT)*(3.3/4096);//U
-                ssss[2]=ADC_Get(ADC_0, ADC0_CH11_A11, ADC_12BIT)*(3.3/4096)/0.4;//I
-                ssss[3]=ssss[1]*ssss[2];
+
+                if(charge_num<10)
+                {
+                    charge_avg_U[charge_num]=ADC_Get(ADC_0, ADC0_CH10_A10, ADC_12BIT)*(3.3/4096);
+                    charge_avg_I[charge_num]=ADC_Get(ADC_0, ADC0_CH11_A11, ADC_12BIT)*(3.3/4096)/0.4;
+                    charge_num++;
+                }
+                else if (charge_num==10)
+                {
+                    for (int j=0;j<9;j++)
+                    {
+                        charge_avg_U[j]=charge_avg_U[j+1];
+                        charge_avg_I[j]=charge_avg_I[j+1];
+                    }
+                    charge_avg_U[9]=ADC_Get(ADC_0, ADC0_CH10_A10, ADC_12BIT)*(3.3/4096);
+                    charge_avg_I[9]=ADC_Get(ADC_0, ADC0_CH11_A11, ADC_12BIT)*(3.3/4096)/0.4;
+                }
+                ssss[1]=sum_array_float(charge_avg_U,10)/10;
+                ssss[2]=sum_array_float(charge_avg_I,10)/10;
+                //ssss[1]=ADC_Get(ADC_0, ADC0_CH10_A10, ADC_12BIT)*(3.3/4096);//U
+                //ssss[2]=ADC_Get(ADC_0, ADC0_CH11_A11, ADC_12BIT)*(3.3/4096)/0.4;//I
+                ssss[3]=(11.287*ssss[1]-0.7624)*ssss[2];
 
                 wifidata[0]=ssss[0];
                 wifidata[1]=ssss[1];
@@ -170,22 +190,23 @@ while(1)
                 wifidata[4]=11.287*ssss[1]-0.7624;
                 wifidata[6]=Charge_U;
                 wifidata[7]=charge_drs;
-                wifidata[8]=CAR[1].datafloat;
-                wifidata[9]=CAR[2].datafloat;
-                wifidata[10]=CAR[3].datafloat;
-                wifidata[11]=CAR[4].datafloat;
-                wifidata[12]=CAR[5].datafloat;
-
-
-                //ssss[3]=SmartCar_Encoder_Get(GPT12_T2);
-                //ssss[4]=SmartCar_Encoder_Get(GPT12_T6);
-                //SmartCar_VarUpload(ssss,5);
+                /*wifidata[8]=CAR[2].datafloat;
+                wifidata[9]=CAR[3].datafloat;
+                wifidata[10]=CAR[4].datafloat;
+                wifidata[11]=CAR[5].datafloat;
+                wifidata[12]=CAR[6].datafloat;
+                wifidata[13]=ctrl_charge.kp;
+                wifidata[14]=ctrl_charge.ki;
+                wifidata[15]=ctrl_charge.kd;*/
                 currItem = ButtonProcess(GetRoot(currItem), currItem);
+                SmartCar_OLED_Printf6x8(100, 0, "%2.3f",ssss[3]);
+
+                SmartCar_OLED_Printf6x8(100, 2, "%2.3f",11.287*ssss[1]-0.7624);
+                SmartCar_OLED_Printf6x8(100, 3, "%2.3f",ssss[2]);
+                SmartCar_OLED_Printf6x8(100, 4, "%2.3f",charge_pwm);
                 //servo_init(&(c_data[0].servo_pwm));//舵机初始化
                 //Motorsp_Init();    //电机速度初始化
-
-
-                SmartCar_VarUpload(&wifidata[0],13);//WiFi上传数据
+                SmartCar_VarUpload(&wifidata[0],8);//WiFi上传数据
                 //如果标志位发生改变则打断循环
 
                 if(mode_flag != 0x00) break;
@@ -256,10 +277,13 @@ while(1)
 void Charge_PID(void)
 {
     float*m_pwm;
-    PIDCTRL_ErrUpdate(&ctrl_charge, ssss[3]-8);
-    Charge_pwm = PIDCTRL_CalcPIDGain(&ctrl_charge);
-    if(Charge_pwm>10000.0) {m_pwm = &Charge_pwm;*m_pwm = 10000.0;}
-    else if(Charge_pwm<0) {m_pwm = &Charge_pwm;*m_pwm = 0;}
+    PIDCTRL_ErrUpdate(&ctrl_charge,charge_drs- (float)((11.287*ssss[1]-0.7624)*ssss[2]));
+    charge_pwm = PIDCTRL_CalcPIDGain(&ctrl_charge);
+    if(charge_pwm>9999.0) {m_pwm = &charge_pwm;*m_pwm = 9999.0;}
+    else if(charge_pwm<0) {m_pwm = &charge_pwm;*m_pwm = 0;}
+    wifidata[5]=charge_pwm;
+    /*if(Charge_pwm>10000.0) {m_pwm = &Charge_pwm;*m_pwm = 10000.0;}
+    else if(Charge_pwm<0) {m_pwm = &Charge_pwm;*m_pwm = 0;}*/
     //SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_6_TOUT6_P02_6_OUT, Charge_pwm);
 }
 void Charge_pid2(void)
@@ -286,12 +310,14 @@ void Charge_pid2(void)
 IFX_INTERRUPT(cc60_pit_ch0_isr, 0, CCU6_0_CH0_ISR_PRIORITY)
 {
     enableInterrupts();//开启中断嵌套
+    //Charge_pid2();
     Charge_pid2();
     if(ssss[1]>((Charge_U+0.7624)/11.287))
     {
         charge_pwm=0;
         wifidata[5]=charge_pwm;
     }
+    //charge_pwm=500;
     SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_6_TOUT6_P02_6_OUT, charge_pwm);
 
     PIT_CLEAR_FLAG(CCU6_0, PIT_CH0);
@@ -538,11 +564,11 @@ MenuItem_t *ButtonProcess(MenuItem_t *Menu, MenuItem_t* currItem)
                 //memcpy(&buff[0], CAR, sizeof(Car_data) * Max_Item_Amount);
                 Date_Write(1);
                 MenuPrint(Menu, currItem);
-                ctrl_charge.kp=CAR[1].datafloat;
-                ctrl_charge.ki=CAR[2].datafloat;
-                ctrl_charge.kd=CAR[3].datafloat;
-                Charge_U=CAR[4].datafloat;
-                charge_drs=CAR[5].datafloat;
+                ctrl_charge.kp=CAR[2].datafloat;
+                ctrl_charge.ki=CAR[3].datafloat;
+                ctrl_charge.kd=CAR[4].datafloat;
+                Charge_U=CAR[5].datafloat;
+                charge_drs=CAR[6].datafloat;
 
             }
             else if (currItem->Item_type == listType)
@@ -827,14 +853,20 @@ void Date_Read(uint32 sector_num)
     CAR[1].datafloat=Page_Read(sector_num,0,float);
     CAR[2].datafloat=Page_Read(sector_num,1,float);
     CAR[3].datafloat=Page_Read(sector_num,2,float);
+    CAR[4].datafloat=Page_Read(sector_num,3,float);
+    CAR[5].datafloat=Page_Read(sector_num,4,float);
+    CAR[6].datafloat=Page_Read(sector_num,5,float);
 }
 void Date_Write(uint32 sector_num)
 {
     Sector_Erase(sector_num);
-    uint32 fla[3];
+    uint32 fla[6];
     fla[0]=float_conversion_uint32(CAR[1].datafloat);
     fla[1]=float_conversion_uint32(CAR[2].datafloat);
     fla[2]=float_conversion_uint32(CAR[3].datafloat);
+    fla[3]=float_conversion_uint32(CAR[4].datafloat);
+    fla[4]=float_conversion_uint32(CAR[5].datafloat);
+    fla[5]=float_conversion_uint32(CAR[6].datafloat);
     Sector_Program(sector_num,fla);
 }
 

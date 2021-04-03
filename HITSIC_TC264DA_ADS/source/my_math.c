@@ -113,5 +113,15 @@ int sum_array(int a[],int num)
     }
     return s;
 }
+float sum_array_float(float a[],int num)
+{
+    float s=0;
+    for(int i=0;i<num;i++)
+    {
+        s+=a[i];
+    }
+    return s;
+}
+
 
 
