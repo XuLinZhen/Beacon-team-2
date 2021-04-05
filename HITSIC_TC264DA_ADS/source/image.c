@@ -11,10 +11,23 @@
 #include "my_math.h"
 #include "team_ctr.h"
 int f[10 * CAMERA_H];//考察连通域联通性
-int flag=-1;
-int light_flag[10]={0};
+int flag=0;    //灯标志位-1：没找到，1：找到
+int light_flag[10]={0};   //找到/没找到灯标志位存放数组
+//光电管存放数组
+int light_gdg11_9[10]={0};
+int light_gdg11_10[10]={0};
+int light_gdg11_11[10]={0};
+int light_gdg11_12[10]={0};
+
 int number=0;
+//找灯数组求和
 int sum=0;
+//光电管数组求和
+int sum_gdg11_9=0;
+int sum_gdg11_10=0;
+int sum_gdg11_11=0;
+int sum_gdg11_12=0;
+
 int speed_add_flag=0;
 int speed_reduce_flag=0;
 uint32 speed_judge_light=0;
@@ -458,6 +471,7 @@ void get_mid_line(void)
 ///////////////////////////////////////////
 void image_main()
 {
+    Delay_ms(STM1,10);
     //head_clear();//清车头
    // banmaxian(zebra);//斑马线识别
     search_white_range();
@@ -467,6 +481,17 @@ void image_main()
     if(number<10)
     {
         light_flag[number]=flag;
+        if(GPIO_Read(P11,9)) light_gdg11_9[number]=GPIO_Read(P11,9);
+        else light_gdg11_9[number]=-1;
+        if(GPIO_Read(P11,10)) light_gdg11_10[number]=GPIO_Read(P11,10);
+        else light_gdg11_10[number]=-1;
+        if(GPIO_Read(P11,11)) light_gdg11_11[number]=GPIO_Read(P11,11);
+        else light_gdg11_11[number]=-1;
+        if(GPIO_Read(P11,12)) light_gdg11_12[number]=GPIO_Read(P11,12);
+        else light_gdg11_12[number]=-1;
+        /*light_gdg11_10[number]=GPIO_Read(P11,10);
+        light_gdg11_11[number]=GPIO_Read(P11,11);
+        light_gdg11_12[number]=GPIO_Read(P11,12);*/
         number++;
     }
     else if (number==10)
@@ -474,39 +499,91 @@ void image_main()
         for (int j=0;j<9;j++)
         {
             light_flag[j]=light_flag[j+1];
+            light_gdg11_9[j]=light_gdg11_9[j+1];
+            light_gdg11_10[j]=light_gdg11_10[j+1];
+            light_gdg11_11[j]=light_gdg11_11[j+1];
+            light_gdg11_12[j]=light_gdg11_12[j+1];
         }
         light_flag[9]=flag;
+        if(GPIO_Read(P11,9)) light_gdg11_9[9]=GPIO_Read(P11,9);
+        else light_gdg11_9[9]=-1;
+        if(GPIO_Read(P11,10)) light_gdg11_10[9]=GPIO_Read(P11,10);
+        else light_gdg11_10[9]=-1;
+        if(GPIO_Read(P11,11)) light_gdg11_11[9]=GPIO_Read(P11,11);
+        else light_gdg11_11[9]=-1;
+        if(GPIO_Read(P11,12)) light_gdg11_12[9]=GPIO_Read(P11,12);
+        else light_gdg11_12[9]=-1;
+        /*light_gdg11_9[9]=GPIO_Read(P11,9);
+        light_gdg11_10[9]=GPIO_Read(P11,10);
+        light_gdg11_11[9]=GPIO_Read(P11,11);
+        light_gdg11_12[9]=GPIO_Read(P11,12);*/
     }
+
     sum=sum_array(light_flag,10);
-    if(sum<=2 && sum>=-2 && flag==-1)
+    sum_gdg11_9=sum_array(light_gdg11_9,10);
+    sum_gdg11_10=sum_array(light_gdg11_10,10);
+    sum_gdg11_11=sum_array(light_gdg11_11,10);
+    sum_gdg11_12=sum_array(light_gdg11_12,10);
+    wifidata[12]=sum_gdg11_9;
+    wifidata[13]=sum_gdg11_10;
+    wifidata[14]=sum_gdg11_11;
+    wifidata[15]=sum_gdg11_12;
+    wifidata[0]=sum;
+
+    if( sum>=-2 && flag==-1)  //追灯过程中 灯灭时保持之前轨迹
     {
         centre_h=centre_h_pre;
         centre_l=centre_l_pre;
     }
-    else if(sum<-3 )  //已切灯，寻找下一个
+    else if(sum<=-5 )  //已切灯，寻找下一个
     {
-        if(centre_l<94) //左切,舵机左打满
-        {
-            centre_h=0;
-            centre_l=0;
-        }
-        else if (centre_l>=94)  //右切，舵机右打满
+        if((sum_gdg11_9>2 && sum_gdg11_9<8) || (sum_gdg11_10>2 && sum_gdg11_10<8))  //灯在右侧 需要右打满
         {
             centre_h=0;
             centre_l=188;
         }
-    //减加速标志位清零
+        else if((sum_gdg11_11>2 && sum_gdg11_11<8) || (sum_gdg11_12>2 && sum_gdg11_12<8))  //灯在左侧  需要左打满
+        {
+            centre_h=0;
+            centre_l=0;
+        }
+        else
+        {
+            if(centre_l<94) //右切,舵机左打满
+              {
+                  centre_h=0;
+                  centre_l=0;
+              }
+              else if (centre_l>=94)  //左切，舵机右打满
+              {
+                  centre_h=0;
+                  centre_l=188;
+              }
+        }
+
     }
-    else if (sum<-3 &&light_flag[9]==1)
+    else if (sum<=-4 &&light_flag[9]==1)   //找到下一个灯，开始下一次循环
     {
+        //求和清零
         sum=0;
+        sum_gdg11_9=0;
+        sum_gdg11_10=0;
+        sum_gdg11_11=0;
+        sum_gdg11_12=0;
+        //数组清零
         light_flag[0]=1;
+        light_gdg11_9[0]=0;
+        light_gdg11_10[0]=0;
+        light_gdg11_11[0]=0;
+        light_gdg11_12[0]=0;
         for (int j=1;j<10;j++)
         {
             light_flag[j]=0;
+            light_gdg11_9[j]=0;
+            light_gdg11_10[j]=0;
+            light_gdg11_11[j]=0;
+            light_gdg11_12[j]=0;
         }
-        /*speed_add_flag=0;
-        speed_reduce_flag=0;*/
     }
 }
 float get_error(void)
@@ -557,7 +634,7 @@ float get_error(void)
                 a=id-tr;
             }
     }*/
-if(centre_h<=20)
+if(centre_h<=15)
 {
     if(centre_l>94) a=94-centre_l;
     else a=94-centre_l;

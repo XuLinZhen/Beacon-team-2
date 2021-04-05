@@ -14,7 +14,8 @@
 //#include "highgui.h"
 #include <math.h>
 #include "common.h"
-//#include "image.h"
+#include "SmartCar_GPIO.h"
+#include "SmartCar_Systick.h"
 
 //#define MISS 94
 #define CAMERA_H  120                            //Í¼Æ¬¸ß¶È

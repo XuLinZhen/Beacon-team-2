@@ -10048,3 +10048,35 @@ java.util.concurrent.RejectedExecutionException: Task java.util.concurrent.Sched
 	at org.eclipse.core.internal.events.AutoBuildJob.doBuild(AutoBuildJob.java:157)
 	at org.eclipse.core.internal.events.AutoBuildJob.run(AutoBuildJob.java:244)
 	at org.eclipse.core.internal.jobs.Worker.run(Worker.java:63)
+!SESSION 2021-04-04 18:22:29.615 -----------------------------------------------
+eclipse.buildId=1.3.0
+java.version=11.0.2
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=zh_CN
+Framework arguments:  -perspective com.infineon.aurix.buildmanager.perspective.c
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -perspective com.infineon.aurix.buildmanager.perspective.c
+
+!ENTRY com.tasking.debug.cdt.core 4 150 2021-04-04 19:13:49.598
+!MESSAGE Error creating session 
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-04-04 19:13:49.598
+!MESSAGE The debug instrument IO could not be initialized.
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-04-04 19:13:49.598
+!MESSAGE The GDI debug instrument provided the following error message.
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-04-04 19:13:49.598
+!MESSAGE Could not open Access HW
+!SESSION 2021-04-05 10:29:37.198 -----------------------------------------------
+eclipse.buildId=1.3.0
+java.version=11.0.2
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=zh_CN
+Framework arguments:  -perspective com.infineon.aurix.buildmanager.perspective.c
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -perspective com.infineon.aurix.buildmanager.perspective.c
+
+!ENTRY com.tasking.debug.cdt.core 4 150 2021-04-05 10:44:03.073
+!MESSAGE Error creating session 
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-04-05 10:44:03.073
+!MESSAGE The debug instrument IO could not be initialized.
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-04-05 10:44:03.073
+!MESSAGE The GDI debug instrument provided the following error message.
+!SUBENTRY 1 com.tasking.debug.cdt.core 4 150 2021-04-05 10:44:03.073
+!MESSAGE An internal error has occurred.

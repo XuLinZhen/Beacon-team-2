@@ -24,6 +24,12 @@ team_ctr.o :	../source/image.h
 ../source/image.h :
 team_ctr.o :	../SmartCar/common.h
 ../SmartCar/common.h :
+team_ctr.o :	../SmartCar/SmartCar_GPIO.h
+../SmartCar/SmartCar_GPIO.h :
+team_ctr.o :	../SmartCar/SmartCar_Systick.h
+../SmartCar/SmartCar_Systick.h :
+team_ctr.o :	../SmartCar/common.h
+../SmartCar/common.h :
 team_ctr.o :	../source/team_elec.h
 ../source/team_elec.h :
 team_ctr.o :	../SmartCar/common.h
