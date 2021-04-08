@@ -58,6 +58,11 @@ float time=0;
 int mode_flag = 0;//状态切换标志位变量
 int *p_mflag = NULL;//状态切换指针
 int prem_flag = 0;//状态切换标志位变量2，previous标志位
+float Voltage_tr = 0;//实际电压检测变量
+float Voltage_id = 0;//理想电压
+/**电压采集数组 */
+float Voltage[10]={0};
+int number_V=0;
 
 void elec_runcar(void);//电磁跑车函数
 void mode_switch(void);//模式切换中断回调函数
@@ -97,7 +102,6 @@ int core0_main(void)
     SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_3_TOUT56_P21_5_OUT, 20000, 0);
     //舵机
     SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM1_1_TOUT31_P33_9_OUT, 50, 0);
-    //SmartCar_Gtm_Pwm_Init(&IfxGtm_ATOM0_1_TOUT31_P33_9_OUT, 50, 0);
     /** 定时中断初始化 */
     Pit_Init(CCU6_0,PIT_CH0,5*1000);  //电机
     //Pit_Init(CCU6_0,PIT_CH1,30*1000);  //待定
@@ -110,6 +114,7 @@ int core0_main(void)
     /** ADC */
     ADC_Init(ADC_2, ADC2_CH11_A45);
     ADC_Init(ADC_2, ADC2_CH12_A46);
+    ADC_Init(ADC_1, ADC1_CH1_A17);  //电池电压
     /** 初始化摄像头 */
     SmartCar_MT9V034_Init();
     /** 初始化串口 */
@@ -118,7 +123,7 @@ int core0_main(void)
     MenuItem_t* MenuRoot = MenuCreate();
     MenuItem_t *currItem = MenuRoot->Child_list;
     /*初始化标志位*/
-    delay_runcar = 1;//延迟发车标志位
+    delay_runcar = 0;//延迟发车标志位
     banmaxian_flag = 0;//斑马线识别标志位
     /** 初始化结束，开启总中断 */
     IfxCpu_enableInterrupts();
@@ -135,6 +140,7 @@ int core0_main(void)
     threshold=CAR[13].dataint;
     c_data[1].Motorspeed[0]=CAR[18].datafloat;
     c_data[0].Sradio=CAR[19].datafloat;
+    Voltage_id=CAR[20].datafloat;
 while(1)
 {
     switch(mode_flag)//菜单模式
@@ -144,7 +150,7 @@ while(1)
 
             MenuPrint(MenuRoot, currItem);                  //构建菜单并打印
             //当标志位为0时:
-            delay_runcar = 1;  //延迟发车标志位置为0
+            delay_runcar = 0;  //延迟发车标志位置为0
             while(1)
             {
                 //SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, 4000);
@@ -163,20 +169,11 @@ while(1)
                 Motorsp_Init();    //电机速度初始化
                 SmartCar_VarUpload(&wifidata[0],16);//WiFi上传数据
                 //如果标志位发生改变则打断循环
-                uint8 status11_9 = GPIO_Read(P11,9);
-                uint8 status11_10 = GPIO_Read(P11,10);
-                uint8 status11_11 = GPIO_Read(P11,11);
-                uint8 status11_12 = GPIO_Read(P11,12);
-                SmartCar_OLED_Printf6x8(90, 0, "%d" , status11_9);
-                SmartCar_OLED_Printf6x8(90, 1, "%d" , status11_10);
-                SmartCar_OLED_Printf6x8(90, 2, "%d" , status11_11);
-                SmartCar_OLED_Printf6x8(90, 3, "%d" , status11_12);
-
                 if(mode_flag != 0x00) break;
             }
         }
         break;
-        case 0x01://模式待定
+        case 0x01://显示图像
         {
             SmartCar_OLED_Fill(0);
           while(1)
@@ -184,8 +181,6 @@ while(1)
 
               while (!mt9v034_finish_flag){}
               mt9v034_finish_flag = 0;
-              //THRE();
-              //image_main();
               SmartCar_Show_IMG((uint8*) mt9v034_image, 120, 188);
               SmartCar_OLED_Printf6x8(95, 0, "%3.3f",time);
               //SmartCar_VarUpload(&wifidata[0],16);//WiFi上传数据
@@ -202,10 +197,30 @@ while(1)
             float ser=6.8;
             servo_init(&(ser));//舵机初始化
             //servo_init(&(c_data[0].servo_pwm));//舵机初始化
-            delay_runcar = 1;   //延时发车标志位置0
+            delay_runcar = 0;   //延时发车标志位置0
+
             //p = pitMgr_t::insert(5000U, 1U, Delay_car, pitMgr_t::enable);//延时发车，测试删除定时器中断
             while(1)
                {
+                //检测电压，达到预设值起跑
+                if(number_V<10)
+                {
+                    Voltage[number_V]=ADC_Get(ADC_1, ADC1_CH1_A17, ADC_12BIT)*3.3/4096;
+                    number_V++;
+                }
+                else if (number_V==10)
+                {
+                    for (int j=0;j<9;j++)
+                    {
+                        Voltage[j]=Voltage[j+1];
+                    }
+                    Voltage[9]=ADC_Get(ADC_1, ADC1_CH1_A17, ADC_12BIT)*3.3/4096;
+                }
+                float sum_V=sum_array_float(Voltage,10);
+                Voltage_tr=sum_V/10;
+                if(Voltage_tr>2.5) delay_runcar = 1;////////////////////////////////////////
+                wifidata[1]=delay_runcar;
+                wifidata[0]=Voltage_tr;
                 Systick_Start(STM0);
                //if(delay_runcar==1) pitMgr_t::remove(*p);//测试不再延迟发车，清除定时器中断
                prem_flag = mode_flag;
@@ -215,7 +230,7 @@ while(1)
                THRE();
                image_main();
                //servo_pid();
-               Speed_radio((c_data[0].servo_pwm-c_data[0].servo_mid));
+               //Speed_radio((c_data[0].servo_pwm-c_data[0].servo_mid));
                //SmartCar_Show_IMG((uint8*) mt9v034_image, 120, 188);
                /* 传图 */
                //SmartCar_ImgUpload((uint8*) mt9v034_image, 120, 188);
@@ -229,7 +244,7 @@ while(1)
         }break;
         case 0x03://电磁跑车模式
         {
-            delay_runcar = 1;//延迟发车标志位
+            delay_runcar = 0;//延迟发车标志位
         while(1)
           {
             prem_flag = mode_flag;
@@ -401,16 +416,24 @@ MenuItem_t *MenuCreate(void)
     MenuItem_t* Motor_Speed_zx = ItemCreate("M_Speed_zx", floatType, 0, 100);
     MenuItem_t* Motor_Speed_qd = ItemCreate("M_Speed_qd", floatType, 0, 100);
     MenuItem_t* Motor_csb = ItemCreate("M_Sp_csb", floatType, 0, 100);
+    MenuItem_t* Volta_id = ItemCreate("U_id", floatType, 0, 100);
+
     Motor_csb->Item_data->datafloat=c_data[0].Sradio;
     Motor_Speed_zx->Item_data->datafloat=c_data[0].Motorspeed[0];
     Motor_Speed_qd->Item_data->datafloat=c_data[1].Motorspeed[0];
+    Volta_id->Item_data->datafloat=Voltage_id;
+
     MenuItem_Insert(Motor, Motor_csb);
+
+
+
     MenuItem_Insert(MenuRoot, ItemCreate("*******", listType, 0, 20));
     MenuItem_Insert(MenuRoot, Motor);
     MenuItem_Insert(MenuRoot, Servo);
     MenuItem_Insert(MenuRoot, Camera);
     MenuItem_Insert(MenuRoot, Motor_Speed_zx);
     MenuItem_Insert(MenuRoot, Motor_Speed_qd);
+    MenuItem_Insert(MenuRoot, Volta_id);
     MenuItem_Insert(MenuRoot, SAVE);
     return MenuRoot;
 }
@@ -519,7 +542,7 @@ MenuItem_t *ButtonProcess(MenuItem_t *Menu, MenuItem_t* currItem)
             break;
         case OK:
 
-            if  (currItem->list_ID==7)
+            if  (currItem->list_ID==8)
             {
                 /*da[0]=c_data[0].M_Kp;
                 da[1]=c_data[0].M_Ki;
@@ -542,6 +565,7 @@ MenuItem_t *ButtonProcess(MenuItem_t *Menu, MenuItem_t* currItem)
                 threshold=CAR[13].dataint;
                 c_data[1].Motorspeed[0]=CAR[18].datafloat;
                 c_data[0].Sradio=CAR[19].datafloat;
+                Voltage_id=CAR[20].datafloat;
 
             }
             else if (currItem->Item_type == listType)
@@ -832,11 +856,12 @@ void Date_Read(uint32 sector_num)
     CAR[13].dataint=Page_Read(sector_num,7,int);
     CAR[18].datafloat=Page_Read(sector_num,8,float);
     CAR[19].datafloat=Page_Read(sector_num,9,float);
+    CAR[20].datafloat=Page_Read(sector_num,10,float);
 }
 void Date_Write(uint32 sector_num)
 {
     Sector_Erase(sector_num);
-    uint32 fla[10];
+    uint32 fla[11];
     fla[0]=float_conversion_uint32(CAR[3].datafloat);
     fla[1]=float_conversion_uint32(CAR[4].datafloat);
     fla[2]=float_conversion_uint32(CAR[17].datafloat);
@@ -847,6 +872,7 @@ void Date_Write(uint32 sector_num)
     fla[7]=float_conversion_uint32(CAR[13].dataint);
     fla[8]=float_conversion_uint32(CAR[18].datafloat);
     fla[9]=float_conversion_uint32(CAR[19].datafloat);
+    fla[10]=float_conversion_uint32(CAR[20].datafloat);
     Sector_Program(sector_num,fla);
 }
 

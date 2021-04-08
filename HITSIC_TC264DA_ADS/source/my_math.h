@@ -19,6 +19,7 @@ int distance_LIGHT_true(int x,int y);  //实际距离计算函数
 int distance_LIGHT_ideal_right(int x,int y);
 int distance_LIGHT_ideal_left(int x,int y);//理想距离计算函数
 int sum_array(int a[],int num);
+float sum_array_float(float a[],int num);
 
 
 

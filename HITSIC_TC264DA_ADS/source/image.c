@@ -528,7 +528,7 @@ void image_main()
     wifidata[13]=sum_gdg11_10;
     wifidata[14]=sum_gdg11_11;
     wifidata[15]=sum_gdg11_12;
-    wifidata[0]=sum;
+    //wifidata[0]=sum;
 
     if( sum>=-2 && flag==-1)  //追灯过程中 灯灭时保持之前轨迹
     {

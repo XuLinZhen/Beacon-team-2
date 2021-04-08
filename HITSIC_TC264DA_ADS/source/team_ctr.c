@@ -8,7 +8,7 @@
 
 #include "team_ctr.h"
 
-int delay_runcar = 1;//延迟发车标志位
+int delay_runcar = 0;//延迟发车标志位
 float error_n = 0;      //舵机偏差
 float error_n_1 = 0;    //舵机前一次偏差
 int mot_left = 0;  //电机左轮编码器读取
@@ -39,7 +39,6 @@ cardata c_data[2]=
         {{22,0,150},7.51,7.51,0.0091,0.0065,1.0,0.4,2.0},
         {{22,0,150},7.51,7.51,0.0091,0.0065,1.0,0.4,2.0},
 };
-
 void Motor_ctr(void)//电机控制闭环
 {
     mot_left  = -SmartCar_Encoder_Get(GPT12_T2);
@@ -49,29 +48,20 @@ void Motor_ctr(void)//电机控制闭环
     float mot_speed_right = (mot_right/5758)*100;
     SmartCar_Encoder_Clear(GPT12_T6);//5742
     //5758
-    /*mot_left =  SCFTM_GetSpeed(FTM1);
-    SCFTM_ClearSpeed(FTM1);//测试差速时可以注释掉
-    mot_right = -SCFTM_GetSpeed(FTM2);
-    SCFTM_ClearSpeed(FTM2);//测试差速时可以注释掉*/
     //if(banmaxian_flag == 1||out_flag == 1) {Motorsp_Set(0.0,0.0);Motor_pid();}
     Motor_pid();
-    /*Speed_radio((c_data[0].servo_pwm-c_data[0].servo_mid));
-    PIDCTRL_ErrUpdate(&ctrl_pwm, M_left_drs-mot_speed_left);
-    M_left_pwm = PIDCTRL_CalcPIDGain(&ctrl_pwm);
-    PIDCTRL_ErrUpdate(&ctrl_pwm, M_right_drs-mot_speed_right);
-    M_right_pwm = PIDCTRL_CalcPIDGain(&ctrl_pwm);*/
-    /*if(delay_runcar == 0)//延迟发车
+    if(delay_runcar == 0)//延迟发车
     {
         SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, 0);
         SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_1_TOUT54_P21_3_OUT, 0);
         SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_2_TOUT55_P21_4_OUT, 0);
         SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_3_TOUT56_P21_5_OUT, 0);
-        //SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_0, 20000U,0U);
-        //SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_1, 20000U, 0U);
-        //SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_3, 20000U, 0U);
-        //SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_2, 20000U, 0U);
+//        SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_0, 20000U,0U);
+//        SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_1, 20000U, 0U);
+//        SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_3, 20000U, 0U);
+//        SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_2, 20000U, 0U);
     }//延时发车
-    else*/
+    else
     {
     /*限幅代码*/
     float *p;
@@ -92,75 +82,28 @@ void Motor_ctr(void)//电机控制闭环
     else*/
     if(M_right_pwm>0)
     {
-        /*if(M_right_pwm>M_left_pwm)
-        {
-            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_2_TOUT55_P21_4_OUT, M_right_pwm*100*1.2);
-            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_3_TOUT56_P21_5_OUT, 0);
-        }
-        else
-        {
-            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_2_TOUT55_P21_4_OUT, M_right_pwm*100*0.8);
-            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_3_TOUT56_P21_5_OUT, 0);
-        }*/
-        SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_2_TOUT55_P21_4_OUT, M_right_pwm*100);
-        SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_3_TOUT56_P21_5_OUT, 0);
-    //SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_0, 20000U,M_right_pwm);//右轮正转kFTM_Chnl_0> kFTM_Chnl_1
-    //SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_1, 20000U, 0U);
+     SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_2_TOUT55_P21_4_OUT, M_right_pwm*100);
+     SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_3_TOUT56_P21_5_OUT, 0);//右轮正转
     }
     else
     {
-        /*if(M_right_pwm>M_left_pwm)
-        {
-            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_2_TOUT55_P21_4_OUT, 0);
-            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_3_TOUT56_P21_5_OUT, -M_right_pwm*100*0.8);
-        }
-        else
-        {
-            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_2_TOUT55_P21_4_OUT, 0);
-            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_3_TOUT56_P21_5_OUT, -M_right_pwm*100*1.2);
-        }*/
      SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_2_TOUT55_P21_4_OUT, 0);
-     SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_3_TOUT56_P21_5_OUT, -M_right_pwm*100);
-     //SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_0, 20000U, 0U);//右轮反转kFTM_Chnl_0> kFTM_Chnl_1
-     //SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_1, 20000U, -M_right_pwm);
+     SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_3_TOUT56_P21_5_OUT, -M_right_pwm*100);//右轮反转
     }
     if(M_left_pwm>0)
     {
-        /*if(M_right_pwm>M_left_pwm)
-        {
-            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, M_left_pwm*100*0.8);
-            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_1_TOUT54_P21_3_OUT, 0);
-        }
-        else
-        {
-            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, M_left_pwm*100*1.2);
-            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_1_TOUT54_P21_3_OUT, 0);
-        }*/
-    SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, M_left_pwm*100);
-    SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_1_TOUT54_P21_3_OUT, 0);
-    //SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_3, 20000U, 0U);
-    //SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_2, 20000U, M_left_pwm);//左轮正转kFTM_Chnl_3> kFTM_Chnl_2
+     SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, M_left_pwm*100);
+     SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_1_TOUT54_P21_3_OUT, 0);//左轮正转
     }
     else
     {
-        /*if(M_right_pwm>M_left_pwm)
-        {
-            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, 0);
-            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_1_TOUT54_P21_3_OUT, -M_left_pwm*100*1.2);
-        }
-        else
-        {
-            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, 0);
-            SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_1_TOUT54_P21_3_OUT, -M_left_pwm*100*0.8);
-        }*/
-    SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, 0);
-    SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_1_TOUT54_P21_3_OUT, -M_left_pwm*100);
-    //SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_3, 20000U, -M_left_pwm);
-    //SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_2, 20000U, 0U);//左轮反转kFTM_Chnl_3> kFTM_Chnl_2
+     SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, 0);
+     SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_1_TOUT54_P21_3_OUT, -M_left_pwm*100);//左轮反转
     }
    }
     //wifidata[0]=mot_speed_left;
-    wifidata[1]=mot_right;wifidata[2]=M_left_drs;wifidata[3]=M_right_drs;wifidata[4]=M_left_pwm;wifidata[5]=M_right_pwm;
+    //wifidata[1]=mot_speed_right;
+    wifidata[2]=M_left_drs;wifidata[3]=M_right_drs;wifidata[4]=M_left_pwm;wifidata[5]=M_right_pwm;
     //wifidata[5]=c_data[0].servo_pwm;
     //SmartCar_VarUpload(&wifidata[0],12);//WiFi上传数据
 }
@@ -196,8 +139,8 @@ void servo()
     else if(c_data[0].servo_pwm>8.2)
             c_data[0].servo_pwm=8.2;
     Speed_radio((c_data[0].servo_pwm-c_data[0].servo_mid));
-    SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM1_1_TOUT31_P33_9_OUT, c_data[0].servo_pwm*100 );
-    //SCFTM_PWM_ChangeHiRes(FTM3,kFTM_Chnl_7,50,c_data[0].servo_pwm);
+    if(delay_runcar == 0) SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM1_1_TOUT31_P33_9_OUT, 0 );
+    else if(delay_runcar == 1) SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM1_1_TOUT31_P33_9_OUT, c_data[0].servo_pwm*100 );
 }
 void Motorsp_Init()
 {
@@ -243,7 +186,6 @@ void Motor_pid()
    else
    {
        p_pwm=p_erro=p_errolast=p_drs=m_pwm=NULL;
-
    }
 
 }
