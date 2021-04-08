@@ -44,13 +44,30 @@
 #define OLED_RES_PIN_NUM    1//RES
 #define OLED_DC_PIN_MODULE  MODULE_P15//DC
 #define OLED_DC_PIN_NUM     0//DC
+//用作软件spi时初始化引脚
+#define OLED_SCL_MODULE        MODULE_P15//使用软件spi引脚请在此处定义
+#define OLED_SDA_MODULE        MODULE_P15
+#define OLED_RST_MODULE        MODULE_P15
+#define OLED_DC_MODULE         MODULE_P15
+#define OLED_CS_MODULE         MODULE_P15
+#define OLED_SCL_NUM        3
+#define OLED_SDA_NUM        5
+#define OLED_RST_NUM        1
+#define OLED_DC_NUM         0
+#define OLED_CS_NUM         2
 
 
 extern IfxQspi_SpiMaster_Channel oled_spiChannel;
 extern IfxQspi_SpiMaster oled_spi;
 
 void SmartCar_Oled_Config_Init();
+void SmartCar_Oled_Imit_Pininit(void);
 void SmartCar_Oled_Init(void);
+
+void OLED_Imit_WtrData(uint8 data);
+void OLED_Imit_WrtCmd(uint8 cmd);
+void OLED_QSPI_WrtCmd(uint8 cmd);
+void OLED_QSPI_WrtData(uint8 data);
 
 /*
  * brief 写指令到oeld
