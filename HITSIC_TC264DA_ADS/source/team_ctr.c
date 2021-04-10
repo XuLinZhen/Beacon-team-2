@@ -53,8 +53,11 @@ void Motor_ctr(void)//电机控制闭环
     if(delay_runcar == 0)//延迟发车
     {
         SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, 0);
+        Systick_Delay(STM0,10);
         SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_1_TOUT54_P21_3_OUT, 0);
+        Systick_Delay(STM0,10);
         SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_2_TOUT55_P21_4_OUT, 0);
+        Systick_Delay(STM0,10);
         SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_3_TOUT56_P21_5_OUT, 0);
 //        SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_0, 20000U,0U);
 //        SCFTM_PWM_ChangeHiRes(MOTOR_PERIPHERAL, kFTM_Chnl_1, 20000U, 0U);
@@ -83,21 +86,25 @@ void Motor_ctr(void)//电机控制闭环
     if(M_right_pwm>0)
     {
      SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_2_TOUT55_P21_4_OUT, M_right_pwm*100);
+     Systick_Delay(STM0,10);
      SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_3_TOUT56_P21_5_OUT, 0);//右轮正转
     }
     else
     {
      SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_2_TOUT55_P21_4_OUT, 0);
+     Systick_Delay(STM0,10);
      SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_3_TOUT56_P21_5_OUT, -M_right_pwm*100);//右轮反转
     }
     if(M_left_pwm>0)
     {
      SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, M_left_pwm*100);
+     Systick_Delay(STM0,10);
      SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_1_TOUT54_P21_3_OUT, 0);//左轮正转
     }
     else
     {
      SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_0_TOUT53_P21_2_OUT, 0);
+     Systick_Delay(STM0,10);
      SmartCar_Gtm_Pwm_Setduty(&IfxGtm_ATOM0_1_TOUT54_P21_3_OUT, -M_left_pwm*100);//左轮反转
     }
    }
@@ -146,10 +153,10 @@ void Motorsp_Init()
 {
     float *p_sp;
     p_sp = &M_left_drs;
-    if(centre_h<=15)  *p_sp = (float)c_data[0].Motorspeed[0];
+    if(centre_h<=23)  *p_sp = (float)c_data[0].Motorspeed[0];
     else  *p_sp = (float)c_data[1].Motorspeed[0];
     p_sp = &M_right_drs;
-    if(centre_h<=15)  *p_sp = (float)c_data[0].Motorspeed[0];
+    if(centre_h<=23)  *p_sp = (float)c_data[0].Motorspeed[0];
     else  *p_sp = (float)c_data[1].Motorspeed[0];
 }
 
@@ -207,19 +214,22 @@ void Speed_radio(float x)
        {
            fa=1.0;
        }
-       if(centre_h<=15)
+       if(centre_h<=23)
        {
-           if(mora_flag%2==0)
+           Motorsp_Set(((float)(c_data[0].Motorspeed[0])),((float)c_data[0].Motorspeed[0]));
+           /*if(mora_flag%2==0)
            (x>0)?(Motorsp_Set(((float)(c_data[0].Motorspeed[0]/fa)),((float)c_data[0].Motorspeed[0]))):(Motorsp_Set((float)(c_data[0].Motorspeed[0]),((float)(c_data[0].Motorspeed[0]/fa))));
            else
-           (x>0)?(Motorsp_Set(((float)(c_data[0].Motorspeed[0]*2/(fa+1.0))),((float)(c_data[0].Motorspeed[0]*2*fa/(fa+1.0))))):(Motorsp_Set((float)(c_data[0].Motorspeed[0]*2*fa/(fa+1.0)),((float)(c_data[0].Motorspeed[0]*2/(fa+1.0)))));
+           (x>0)?(Motorsp_Set(((float)(c_data[0].Motorspeed[0]*2/(fa+1.0))),((float)(c_data[0].Motorspeed[0]*2*fa/(fa+1.0))))):(Motorsp_Set((float)(c_data[0].Motorspeed[0]*2*fa/(fa+1.0)),((float)(c_data[0].Motorspeed[0]*2/(fa+1.0)))));*/
+           //(x>0)?(Motorsp_Set(((float)(c_data[0].Motorspeed[0]*2/(c_data[0].Sradio+1.0))),((float)(c_data[0].Motorspeed[0]*2*c_data[0].Sradio/(c_data[0].Sradio+1.0))))):(Motorsp_Set(((float)(c_data[0].Motorspeed[0]*2*c_data[0].Sradio/(c_data[0].Sradio+1.0))),((float)(c_data[0].Motorspeed[0]*2/(c_data[0].Sradio+1.0)))));
        }
        else
        {
-           if(mora_flag%2==0)
-           (x>0)?(Motorsp_Set(((float)(c_data[1].Motorspeed[0]/fa)),((float)c_data[1].Motorspeed[0]))):(Motorsp_Set((float)(c_data[1].Motorspeed[0]),((float)(c_data[1].Motorspeed[0]/fa))));
-           else
-           (x>0)?(Motorsp_Set(((float)(c_data[1].Motorspeed[0]*2/(fa+1.0))),((float)(c_data[1].Motorspeed[0]*2*fa/(fa+1.0))))):(Motorsp_Set((float)(c_data[1].Motorspeed[0]*2*fa/(fa+1.0)),((float)(c_data[1].Motorspeed[0]*2/(fa+1.0)))));
+//           if(mora_flag%2==0)
+//           (x>0)?(Motorsp_Set(((float)(c_data[1].Motorspeed[0]/fa)),((float)c_data[1].Motorspeed[0]))):(Motorsp_Set((float)(c_data[1].Motorspeed[0]),((float)(c_data[1].Motorspeed[0]/fa))));
+//           else
+//           (x>0)?(Motorsp_Set(((float)(c_data[1].Motorspeed[0]*2/(fa+1.0))),((float)(c_data[1].Motorspeed[0]*2*fa/(fa+1.0))))):(Motorsp_Set((float)(c_data[1].Motorspeed[0]*2*fa/(fa+1.0)),((float)(c_data[1].Motorspeed[0]*2/(fa+1.0)))));
+           (x>0)?(Motorsp_Set(((float)(c_data[1].Motorspeed[0]*2/(c_data[0].Sradio+1.0))),((float)(c_data[1].Motorspeed[0]*2*c_data[0].Sradio/(c_data[0].Sradio+1.0))))):(Motorsp_Set(((float)(c_data[1].Motorspeed[0]*2*c_data[0].Sradio/(c_data[0].Sradio+1.0))),((float)(c_data[1].Motorspeed[0]*2/(c_data[0].Sradio+1.0)))));
        }
 }
 void Delay_car()

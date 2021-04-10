@@ -202,26 +202,8 @@ while(1)
             //p = pitMgr_t::insert(5000U, 1U, Delay_car, pitMgr_t::enable);//延时发车，测试删除定时器中断
             while(1)
                {
-                //检测电压，达到预设值起跑
-                if(number_V<10)
-                {
-                    Voltage[number_V]=ADC_Get(ADC_1, ADC1_CH1_A17, ADC_12BIT)*3.3/4096;
-                    number_V++;
-                }
-                else if (number_V==10)
-                {
-                    for (int j=0;j<9;j++)
-                    {
-                        Voltage[j]=Voltage[j+1];
-                    }
-                    Voltage[9]=ADC_Get(ADC_1, ADC1_CH1_A17, ADC_12BIT)*3.3/4096;
-                }
-                float sum_V=sum_array_float(Voltage,10);
-                Voltage_tr=sum_V/10;
-                if(Voltage_tr>2.5) delay_runcar = 1;////////////////////////////////////////
-                wifidata[1]=delay_runcar;
-                wifidata[0]=Voltage_tr;
-                Systick_Start(STM0);
+
+                //Systick_Start(STM0);
                //if(delay_runcar==1) pitMgr_t::remove(*p);//测试不再延迟发车，清除定时器中断
                prem_flag = mode_flag;
                //摄像头跑车程序内容
@@ -229,14 +211,41 @@ while(1)
                mt9v034_finish_flag = 0;
                THRE();
                image_main();
+               //检测电压，达到预设值起跑
+               if(number_V<10)
+               {
+                   Voltage[number_V]=ADC_Get(ADC_1, ADC1_CH1_A17, ADC_12BIT)*3.3/4096;
+                   number_V++;
+               }
+               else if (number_V==10)
+               {
+                   for (int j=0;j<9;j++)
+                   {
+                       Voltage[j]=Voltage[j+1];
+                   }
+                   Voltage[9]=ADC_Get(ADC_1, ADC1_CH1_A17, ADC_12BIT)*3.3/4096;
+               }
+               float sum_V=sum_array_float(Voltage,10);
+               Voltage_tr=sum_V/10;
+               if(Voltage_tr>(Voltage_id)/(float)4)
+               {
+                if(sum<=-5 && delay_runcar==0)
+                 {
+                   centre_h=0;
+                   centre_l=94;
+                 }
+                delay_runcar = 1;////////////////////////////////////////
+               }
+               wifidata[1]=delay_runcar;
+               wifidata[0]=Voltage_tr;
                //servo_pid();
                //Speed_radio((c_data[0].servo_pwm-c_data[0].servo_mid));
                //SmartCar_Show_IMG((uint8*) mt9v034_image, 120, 188);
                /* 传图 */
                //SmartCar_ImgUpload((uint8*) mt9v034_image, 120, 188);
                /********/
-               time=GetTime_ms(STM0);
-               SmartCar_VarUpload(&wifidata[0],16);//WiFi上传数据
+               //time=GetTime_ms(STM0);
+               //SmartCar_VarUpload(&wifidata[0],16);//WiFi上传数据
                if(mode_flag != 0x02) break;
                }
             banmaxian_flag = 0;//斑马线识别标志位

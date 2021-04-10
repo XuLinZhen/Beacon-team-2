@@ -535,34 +535,34 @@ void image_main()
         centre_h=centre_h_pre;
         centre_l=centre_l_pre;
     }
-    else if(sum<=-5 )  //已切灯，寻找下一个
+    else if(sum<=-3 )  //已切灯，寻找下一个
     {
-        if((sum_gdg11_9>2 && sum_gdg11_9<8) || (sum_gdg11_10>2 && sum_gdg11_10<8))  //灯在右侧 需要右打满
+        if(( sum_gdg11_9<6) ||  (sum_gdg11_10<6))  //灯在右侧 需要右打满
         {
-            centre_h=0;
+            centre_h=24;
             centre_l=188;
         }
-        else if((sum_gdg11_11>2 && sum_gdg11_11<8) || (sum_gdg11_12>2 && sum_gdg11_12<8))  //灯在左侧  需要左打满
+        else if(( sum_gdg11_11<6) || ( sum_gdg11_12<6))  //灯在左侧  需要左打满
         {
-            centre_h=0;
+            centre_h=24;
             centre_l=0;
         }
         else
         {
             if(centre_l<94) //右切,舵机左打满
               {
-                  centre_h=0;
+                  centre_h=24;
                   centre_l=0;
               }
               else if (centre_l>=94)  //左切，舵机右打满
               {
-                  centre_h=0;
+                  centre_h=24;
                   centre_l=188;
               }
         }
 
     }
-    else if (sum<=-4 &&light_flag[9]==1)   //找到下一个灯，开始下一次循环
+    else if (sum<=-3 &&light_flag[9]==1)   //找到下一个灯，开始下一次循环
     {
         //求和清零
         sum=0;
@@ -634,7 +634,7 @@ float get_error(void)
                 a=id-tr;
             }
     }*/
-if(centre_h<=15)
+if(centre_h<=20)
 {
     if(centre_l>94) a=94-centre_l;
     else a=94-centre_l;

@@ -47,6 +47,7 @@ extern uint8 out_flag;
 extern int zebra;
 extern uint8 centre_h;
 extern uint8 centre_l;
+extern int sum;
 
 void head_clear(void);
 void THRE(void);
