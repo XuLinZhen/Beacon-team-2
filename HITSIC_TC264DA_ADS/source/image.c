@@ -31,6 +31,8 @@ int sum_gdg11_12=0;
 int speed_add_flag=0;
 int speed_reduce_flag=0;
 uint32 speed_judge_light=0;
+float centre_h_speeddown=0;
+float centre_h_qiedeng=0;
 //每个白条子属性
 typedef struct {
     uint8   left;//左边界
@@ -537,26 +539,26 @@ void image_main()
     }
     else if(sum<=-3 )  //已切灯，寻找下一个
     {
-        if(( sum_gdg11_9<6) ||  (sum_gdg11_10<6))  //灯在右侧 需要右打满
+        if(( sum_gdg11_9<10) ||  (sum_gdg11_10<10))  //灯在右侧 需要右打满
         {
-            centre_h=24;
+            centre_h=centre_h_speeddown+1;
             centre_l=188;
         }
-        else if(( sum_gdg11_11<6) || ( sum_gdg11_12<6))  //灯在左侧  需要左打满
+        else if(( sum_gdg11_11<10) || ( sum_gdg11_12<10))  //灯在左侧  需要左打满
         {
-            centre_h=24;
+            centre_h=centre_h_speeddown+1;
             centre_l=0;
         }
         else
         {
             if(centre_l<94) //右切,舵机左打满
               {
-                  centre_h=24;
+                  centre_h=centre_h_speeddown+1;
                   centre_l=0;
               }
               else if (centre_l>=94)  //左切，舵机右打满
               {
-                  centre_h=24;
+                  centre_h=centre_h_speeddown+1;
                   centre_l=188;
               }
         }
@@ -592,63 +594,22 @@ float get_error(void)
     int id=0;
     int a=0;
     int tr=distance_LIGHT_true(centre_l,centre_h);
-   /* if(centre_h<=20)
-    {
-        speed_add_flag++;
-        if(speed_add_flag==1) speed_judge_light=c_data[0].Motorspeed[0];
-        c_data[0].Motorspeed[0]=speed_judge_light;
-        if(speed_add_flag>1)
-        {
-            speed_judge_light=c_data[0].Motorspeed[0];
-        }
-        else
-        {
-            speed_judge_light+=2;
-        }
-        if(centre_l>94) a=94-centre_l;
-        else a=94-centre_l;
-    }
-    if(centre_l>94) a=94-centre_l;
-            else a=94-centre_l;
-    else
-    {
-        speed_reduce_flag++;
-        if(speed_reduce_flag==1) speed_judge_light=c_data[0].Motorspeed[0];
-        c_data[0].Motorspeed[0]=speed_judge_light;
-        if(speed_reduce_flag>1)
-        {
-            speed_judge_light=c_data[0].Motorspeed[0];
-        }
-        else
-        {
-            speed_judge_light-=2;
-        }
-        if(centre_l>94)
-            {
-                id=distance_LIGHT_ideal_right(centre_l-94,centre_h);
-                a=tr-id;
-            }
-            else
-            {
-                id=distance_LIGHT_ideal_left(centre_l-94,centre_h);
-                a=id-tr;
-            }
-    }*/
-if(centre_h<=20)
+
+if(centre_h<=centre_h_qiedeng)
 {
-    if(centre_l>94) a=94-centre_l;
-    else a=94-centre_l;
+    if(centre_l>94) a=(94-centre_l)/3;
+    else a=(94-centre_l)/3;
 }
 else
 {
     if(centre_l>94)
         {
-            id=distance_LIGHT_ideal_right(centre_l-94,centre_h);
+            id=distance_LIGHT_ideal_right(centre_l,centre_h);
             a=tr-id;
         }
         else
         {
-            id=distance_LIGHT_ideal_left(centre_l-94,centre_h);
+            id=distance_LIGHT_ideal_left(centre_l,centre_h);
             a=id-tr;
         }
 }
@@ -749,7 +710,7 @@ void find_light()
             }
 
         }
-            if (white_range[i].num!=0&&white_range[i].area[light_row].width>=3&& white_range[i-1].num != 0 && white_range[i-1].area[light_row].width >= 3 && white_range[i - 2].num != 0 && white_range[i - 2].area[light_row].width >= 3)
+            if (white_range[i].num!=0&&white_range[i].area[light_row].width>=2&& white_range[i-1].num != 0 && white_range[i-1].area[light_row].width >= 2 && white_range[i - 2].num != 0 && white_range[i - 2].area[light_row].width >= 2)
             {
                 start_light_line = i;
                 flag = 1;

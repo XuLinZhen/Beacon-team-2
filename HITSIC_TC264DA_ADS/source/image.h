@@ -48,6 +48,8 @@ extern int zebra;
 extern uint8 centre_h;
 extern uint8 centre_l;
 extern int sum;
+extern float centre_h_speeddown;
+extern float centre_h_qiedeng;
 
 void head_clear(void);
 void THRE(void);
